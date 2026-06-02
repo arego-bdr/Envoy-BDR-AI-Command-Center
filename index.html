@@ -192,14 +192,122 @@
   .pl3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px;}
   ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px;}
   .obox b{color:white;}.obox em{color:var(--carbon-50);}
+
+  /* ── API KEY MODAL ── */
+  #apikey-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+  #apikey-modal.hidden{display:none;}
+  .ak-card{background:var(--carbon-90);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:32px;width:440px;max-width:90vw;}
+  .ak-logo{width:40px;height:40px;background:var(--red-50);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:white;font-family:'Syne',sans-serif;margin-bottom:20px;}
+  .ak-title{font-size:20px;font-weight:700;color:white;margin-bottom:6px;}
+  .ak-sub{font-size:12px;color:var(--carbon-60);line-height:1.6;margin-bottom:24px;}
+  .ak-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--carbon-50);margin-bottom:8px;}
+  .ak-input{width:100%;background:var(--carbon-80);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:11px 14px;font-size:13px;color:white;font-family:'Sofia Pro',monospace;outline:none;margin-bottom:8px;}
+  .ak-input:focus{border-color:var(--gem-60);}
+  .ak-input::placeholder{color:var(--carbon-60);}
+  .ak-hint{font-size:10px;color:var(--carbon-70);margin-bottom:20px;line-height:1.5;}
+  .ak-hint a{color:var(--gem-40);text-decoration:none;}
+  .ak-btn{width:100%;background:var(--red-50);color:white;border:none;border-radius:8px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;transition:background 120ms;}
+  .ak-btn:hover{background:var(--red-55);}
+  .ak-btn:disabled{opacity:.5;cursor:not-allowed;}
+  .ak-skip{display:block;text-align:center;margin-top:12px;font-size:11px;color:var(--carbon-60);cursor:pointer;}
+  .ak-skip:hover{color:var(--carbon-40);}
+  .ak-saved{display:flex;align-items:center;gap:8px;background:rgba(78,193,118,.1);border:1px solid rgba(78,193,118,.2);border-radius:8px;padding:10px 12px;margin-bottom:16px;font-size:12px;color:var(--cilantro-30);}
+  .ak-saved.hidden{display:none;}
+  /* key status pill in topbar */
+  .key-pill{display:flex;align-items:center;gap:5px;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:600;cursor:pointer;transition:all 100ms;}
+  .key-pill.set{background:rgba(78,193,118,.1);border:1px solid rgba(78,193,118,.2);color:var(--cilantro-30);}
+  .key-pill.unset{background:rgba(233,28,28,.1);border:1px solid rgba(233,28,28,.2);color:var(--red-40);}
+  .key-pill-dot{width:6px;height:6px;border-radius:50%;}
+
+  /* ── REP SELECTOR MODAL ── */
+  #rep-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9998;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+  #rep-modal.hidden{display:none;}
+  .rs-card{background:var(--carbon-90);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:32px;width:480px;max-width:90vw;}
+  .rs-title{font-size:20px;font-weight:700;color:white;margin-bottom:6px;}
+  .rs-sub{font-size:12px;color:var(--carbon-60);line-height:1.6;margin-bottom:24px;}
+  .rs-teams{display:flex;flex-direction:column;gap:16px;}
+  .rs-team-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--carbon-60);margin-bottom:8px;}
+  .rs-reps{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+  .rs-rep{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.07);cursor:pointer;transition:all 120ms;background:rgba(255,255,255,.02);}
+  .rs-rep:hover{border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.05);}
+  .rs-rep.selected{border-color:var(--red-50);background:rgba(233,28,28,.1);}
+  .rs-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;flex-shrink:0;}
+  .rs-name{font-size:11px;font-weight:600;color:white;}
+  .rs-role{font-size:9px;color:var(--carbon-60);margin-top:1px;}
+  .rs-btn{width:100%;background:var(--red-50);color:white;border:none;border-radius:8px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;margin-top:20px;transition:background 120ms;}
+  .rs-btn:hover{background:var(--red-55);}
+  .rs-btn:disabled{opacity:.4;cursor:not-allowed;}
+  /* rep indicator in topbar */
+  .rep-pill{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border-radius:20px;padding:3px 10px;cursor:pointer;transition:all 100ms;}
+  .rep-pill:hover{background:rgba(255,255,255,.09);}
+  .rep-pill-av{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:white;}
+  .rep-pill-name{font-size:10px;font-weight:600;color:white;}
+
+  /* ── MANAGER MODE ── */
+  .mgr-banner{display:none;align-items:center;gap:10px;padding:8px 18px;background:rgba(78,78,218,.08);border-bottom:1px solid rgba(78,78,218,.15);}
+  .mgr-banner.active{display:flex;}
+  .mgr-banner-text{font-size:11px;color:var(--gem-30);font-weight:600;}
+  .mgr-banner-sub{font-size:10px;color:var(--carbon-60);margin-left:4px;}
+  .mgr-view-as{margin-left:auto;display:flex;align-items:center;gap:6px;}
+  .mgr-rep-select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--carbon-30);cursor:pointer;outline:none;font-family:'Sofia Pro',sans-serif;}
+  .mgr-rep-select option{background:var(--carbon-90);}
+  .mgr-view-btn{background:var(--gem-70);color:white;border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;transition:all 100ms;}
+  .mgr-view-btn:hover{background:var(--gem-60);}
+  .mgr-badge{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:rgba(78,78,218,.2);color:var(--gem-30);padding:2px 7px;border-radius:20px;}
 </style>
 </head>
 <body>
+
+
+<!-- REP SELECTOR MODAL -->
+<div id="rep-modal" class="hidden">
+  <div class="rs-card">
+    <div class="ak-logo" style="margin-bottom:16px;">E</div>
+    <div class="rs-title">Who are you?</div>
+    <div class="rs-sub">Select your name so the dashboard, agents, and AI assistant pull your data — calendar, inbox, Outreach tasks, and pipeline.</div>
+    <div class="rs-teams" id="rs-teams-container"></div>
+    <button class="rs-btn" id="rs-confirm-btn" disabled onclick="confirmRep()">Launch my dashboard →</button>
+  </div>
+</div>
+
+<!-- API KEY MODAL -->
+<div id="apikey-modal" class="hidden">
+  <div class="ak-card">
+    <div class="ak-logo">E</div>
+    <div class="ak-title">Connect your API key</div>
+    <div class="ak-sub">The BDR AI Command Center uses the Claude API to power agents, the AI assistant, and the inbox monitor. Add your Anthropic API key to get started.</div>
+    <div class="ak-saved hidden" id="ak-saved">✓ API key saved — all agents are active</div>
+    <div class="ak-label">Anthropic API Key</div>
+    <input class="ak-input" id="ak-input" type="password" placeholder="sk-ant-api03-..." autocomplete="off" />
+    <div class="ak-hint">
+      Get your key at <a href="https://console.anthropic.com/api-keys" target="_blank">console.anthropic.com</a> — create a new key named "BDR Command Center". Your key is stored in your browser session only and never sent anywhere except the Anthropic API.
+    </div>
+    <button class="ak-btn" id="ak-save-btn" onclick="saveApiKey()">Save API Key & Launch</button>
+    <span class="ak-skip" onclick="skipApiKey()">Skip for now — use without AI features</span>
+  </div>
+</div>
+
 <div class="topbar">
   <div class="tl"><div class="logo">E</div><div><div class="ttitle">BDR AI Command Center</div><div class="tsub">Envoy Sales Development</div></div></div>
   <div class="team-toggle"><button class="tbtn active" onclick="setTeam('outbound',this)">Outbound</button><button class="tbtn" onclick="setTeam('inbound',this)">Inbound</button><button class="tbtn" onclick="setTeam('channel',this)">Channel</button></div>
-  <div class="tr"><div class="monitor-pill" id="monitor-topbar-pill"><div class="monitor-pulse"></div><span>Monitor active</span></div><div class="qpill"><div class="qdot"></div><span>Quota MTD</span><span class="qval" id="qd">113%</span></div><div class="av">AR</div></div>
+  <div class="tr"><div class="monitor-pill" id="monitor-topbar-pill"><div class="monitor-pulse"></div><span>Monitor active</span></div><div class="qpill"><div class="qdot"></div><span>Quota MTD</span><span class="qval" id="qd">113%</span></div><div id="rep-topbar-pill" class="rep-pill" onclick="showRepModal()" title="Switch rep"><div class="rep-pill-av" style="background:var(--carbon-70);">—</div><div class="rep-pill-name" style="color:var(--carbon-50);">Select rep</div></div>
+    <div class="av" style="display:none;">AR</div></div>
 </div>
+
+<!-- MANAGER BANNER -->
+<div class="mgr-banner" id="mgr-banner">
+  <div class="mgr-badge">BDR Leader</div>
+  <div class="mgr-banner-text" id="mgr-banner-name">Angela Rego</div>
+  <div class="mgr-banner-sub" id="mgr-banner-sub">· Inbound + Channel view · Full team access</div>
+  <div class="mgr-view-as">
+    <span style="font-size:10px;color:var(--carbon-60);">View as rep:</span>
+    <select class="mgr-rep-select" id="mgr-rep-select">
+      <option value="">Select a rep...</option>
+    </select>
+    <button class="mgr-view-btn" onclick="viewAsRep()">View →</button>
+  </div>
+</div>
+
 <div class="main">
   <nav class="sidebar">
     <div style="margin-bottom:16px;"><div class="nl">Overview</div><div class="ni active" onclick="sv('home',this)"><span class="ic">⚡</span>Dashboard</div></div>
@@ -410,17 +518,27 @@ async function regenDraft(){const ed=document.getElementById('draft-editor');ed.
 const AGENT_SYSTEM={inbox:`Use Gmail MCP (query:"is:unread newer_than:3d -in:sent"). Categorize: 🔴 Needs reply today, 🟡 FYI, ⚪ Auto-replies. Add strategic notes. If unavailable, produce a realistic example.`,tasks:`Use Gmail MCP (query:"is:starred OR subject:follow up newer_than:7d") and Google Calendar MCP for today's events. Output: 🔴 Overdue, 🟡 Due today, ⚪ This week.`,brief:`Use Google Calendar MCP for next meeting. ZoomInfo MCP for company intel. Granola MCP for past notes. Output: About person, Company snapshot, Previous meeting history (Granola), Discovery questions, Talk tracks.`,debrief:`Use Granola MCP for most recent meeting. Extract: 1) Summary, 2) MEDDIC signals, 3) Your action items, 4) Their commitments, 5) Salesforce notes paragraph, 6) Recommended next step.`,history:`Use Granola MCP to search all meetings for an account. Build timeline, summarize relationship health and next angle. Default to "Brex" if unspecified.`,signal:`Use ZoomInfo MCP for scoops and intent signals on Envoy ICP accounts (200-5000 employees, workplace needs). Output: top 5 accounts with signal and action.`,sequence:`Use ZoomInfo MCP to research "Robinhood". Write a 6-step sequence for Facilities Manager/VP Ops/Head of RE: Day 1 email, Day 3 LinkedIn, Day 5 call, Day 8 email 2, Day 12 follow-up, Day 17 breakup.`};
 const AGENT_META={inbox:{title:'Daily Inbox Brief',sub:'Connecting to Gmail — scanning recent prospect emails...'},tasks:{title:'Outstanding Tasks',sub:'Pulling from Gmail + Google Calendar...'},brief:{title:'Discovery Meeting Brief',sub:'Checking Calendar + ZoomInfo + Granola...'},debrief:{title:'Post-Call Debrief',sub:'Pulling your most recent Granola meeting notes...'},history:{title:'Meeting History Lookup',sub:'Searching Granola for past meetings...'},signal:{title:'Signal Agent',sub:'Scanning ZoomInfo for intent signals and scoops...'},sequence:{title:'Sequence Builder',sub:'Pulling company data from ZoomInfo...'}};
 const AGENT_ACTIONS={inbox:[{l:'Draft reply ↗',c:'p',p:'Draft a strategic reply to the most interesting prospect email from my inbox brief'},{l:'Open Gmail',c:'s',link:'https://mail.google.com'}],tasks:[{l:'Plan to clear today ↗',c:'p',p:'Help me prioritize the top overdue tasks'},{l:'Open Salesforce',c:'s',link:'https://envoy.lightning.force.com'}],brief:[{l:'Add to Salesforce notes ↗',c:'p',p:'Format the discovery brief as Salesforce call prep notes'},{l:'Open ZoomInfo',c:'s',link:'https://app.zoominfo.com'}],debrief:[{l:'Copy Salesforce notes ↗',c:'p',p:'Give me just the Salesforce notes section'},{l:'Draft follow-up email ↗',c:'s',p:'Draft a follow-up email confirming next steps from the debrief'}],history:[{l:'Write re-engagement email ↗',c:'p',p:'Write a personalized re-engagement email referencing our previous conversations'},{l:'Open Granola',c:'s',link:'https://app.granola.ai'}],signal:[{l:'Write first touch ↗',c:'p',p:'Write a personalized first-touch cold email for the highest-signal account'},{l:'Open ZoomInfo',c:'s',link:'https://app.zoominfo.com'}],sequence:[{l:'Customize for different account ↗',c:'p',p:'Rewrite the sequence for a VP of Operations at Brex — they just announced an office expansion'},{l:'Open Outreach',c:'s',link:'https://app.outreach.io'}]};
-async function callClaude(system,userMsg,maxTokens=1000){const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:maxTokens,system,messages:[{role:'user',content:userMsg}],mcp_servers:MCP_SERVERS})});const data=await resp.json();if(data.content)return{ok:true,text:data.content.filter(b=>b.type==='text').map(b=>b.text).join('\n')};return{ok:false,text:data.error?.message||'Unknown error'};}
+async function callClaude(system,userMsg,maxTokens=1000){
+  // Inject rep context into system prompt if a rep is selected
+  var activeRep = (typeof VIEWING_AS_REP !== 'undefined' && VIEWING_AS_REP) ? VIEWING_AS_REP : CURRENT_REP;
+  if(activeRep){
+    var roleCtx = (typeof MANAGER_MODE !== 'undefined' && MANAGER_MODE && !VIEWING_AS_REP)
+      ? 'Current user: '+activeRep.name+' (BDR Leader, manages '+activeRep.manages.join('+')+'). Respond as if talking to a sales manager, not a rep.'
+      : 'Current BDR: '+activeRep.name+' ('+activeRep.email+', '+activeRep.team+' team, Slack: '+activeRep.slack+'). Use this to personalize all outputs.';
+    system = roleCtx+'\n\n'+system;
+  }
+  if(false && CURRENT_REP){' ('+CURRENT_REP.email+', '+CURRENT_REP.team+' team, Slack: '+CURRENT_REP.slack+'). Use this to personalize all outputs.\n\n'+system;
+  }if(!ANTHROPIC_API_KEY){return{ok:false,text:'No API key set. Click the key pill in the top right to add your Anthropic API key.'};}const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:maxTokens,system,messages:[{role:'user',content:userMsg}]})});const data=await resp.json();if(data.content)return{ok:true,text:data.content.filter(b=>b.type==='text').map(b=>b.text).join('\n')};return{ok:false,text:data.error?.message||'Unknown error'};}
 function renderOutput(text){return'<div class="os">'+text.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/^#{1,3} (.+)$/gm,'<div class="ost" style="margin-top:14px;">$1</div>').replace(/🔴([^\n]+)/g,'<div class="ost" style="color:var(--red-40);margin-top:12px;">🔴$1</div>').replace(/🟡([^\n]+)/g,'<div class="ost" style="color:var(--papaya-40);margin-top:12px;">🟡$1</div>').replace(/⚪([^\n]+)/g,'<div class="ost" style="color:var(--carbon-60);margin-top:12px;">⚪$1</div>').replace(/^[→•\-] (.+)$/gm,'<div class="oi"><span class="ob">→</span><span>$1</span></div>').replace(/\n\n/g,'</div><div class="os">').replace(/\n/g,'<br>')+'</div>';}
 async function runAgent(key){if(key==='reply'){document.getElementById('run-title').textContent='Reply Agent';document.getElementById('run-sub').textContent='Scanning Gmail for recent prospect replies...';document.getElementById('run-badge').innerHTML='<span style="font-size:9px;font-weight:600;color:var(--cilantro-30);background:rgba(78,193,118,.1);border-radius:4px;padding:2px 8px;">💌 Saves to Gmail Drafts</span>';document.getElementById('regular-output').style.display='none';document.getElementById('reply-output').style.display='block';showRunView();await runReplyAgent();return;}const meta=AGENT_META[key],acts=AGENT_ACTIONS[key]||[];document.getElementById('run-title').textContent=meta.title;document.getElementById('run-sub').textContent=meta.sub;document.getElementById('run-badge').innerHTML=['debrief','history','brief'].includes(key)?'<span style="font-size:9px;font-weight:600;color:var(--gem-30);background:rgba(107,94,255,.15);border-radius:4px;padding:2px 8px;">✦ Granola connected</span>':'';document.getElementById('regular-output').style.display='block';document.getElementById('reply-output').style.display='none';const outEl=document.getElementById('agent-out'),actsEl=document.getElementById('agent-acts');outEl.className='obox loading';outEl.innerHTML='<div class="spin"></div><span>Connecting...</span>';actsEl.style.display='none';showRunView();const result=await callClaude(AGENT_SYSTEM[key],'Run the agent now. Return specific formatted output a BDR would read. Use real MCP data if available; otherwise produce a high-quality realistic example.').catch(e=>({ok:false,text:e.message}));outEl.className='obox';outEl.innerHTML=`<div class="oh">${meta.title.toUpperCase()} — ${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</div>`+renderOutput(result.text);actsEl.style.display='flex';actsEl.innerHTML=acts.map(a=>a.link?`<button class="abtn ${a.c}" onclick="window.open('${a.link}','_blank')">${a.l}</button>`:`<button class="abtn ${a.c}" onclick="alert('Open this in Claude to use: ${a.p}')">${a.l}</button>`).join('');}
 function showRunView(){document.querySelectorAll('[id^="view-"]').forEach(v=>{v.className='view';v.style.display='none';});document.getElementById('view-agent-run').style.display='block';document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));document.querySelectorAll('.ni')[2].classList.add('active');}
 let chatHistory=[],msgId=0;
-async function doChat(){const input=document.getElementById('cinput');const msg=input.value.trim();if(!msg)return;input.value='';document.getElementById('chips').style.display='none';appendMsg(msg,'u');chatHistory.push({role:'user',content:msg});const tid=appendMsg('...','ai');try{const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:`You are the Envoy BDR AI Assistant inside the BDR AI Command Center. Dual-mode coach and strategist. Envoy sells to Facilities Managers, VPs of Ops, HR Directors, IT leaders at 150–5,000 employee companies. Access to Gmail, Calendar, ZoomInfo, Slack, Drive, Outreach, and Granola MCP tools. Be concise and tactical. Give a specific next action at the end.`,messages:chatHistory.slice(-10),mcp_servers:MCP_SERVERS})});const data=await resp.json();const reply=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'Something went wrong.';chatHistory.push({role:'assistant',content:reply});updateMsg(tid,reply);}catch(e){updateMsg(tid,'Connection issue — try again.');}}
+async function doChat(){const input=document.getElementById('cinput');const msg=input.value.trim();if(!msg)return;input.value='';document.getElementById('chips').style.display='none';appendMsg(msg,'u');chatHistory.push({role:'user',content:msg});const tid=appendMsg('...','ai');try{if(!ANTHROPIC_API_KEY){updateMsg(tid,'No API key set. Click the key pill in the top right to add your Anthropic API key.');return;}const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:`You are the Envoy BDR AI Assistant inside the BDR AI Command Center. You are a dual-mode sales coach and strategist for Envoy, which sells workplace platform software to Facilities Managers, VPs of Operations, HR Directors, and IT leaders at 150-5,000 employee companies. Help with cold email copy, objection handling, discovery prep, account research, sequence strategy, and pipeline coaching. Be concise and tactical. End every response with one specific next action.`,messages:chatHistory.slice(-10)})});const data=await resp.json();const reply=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'Something went wrong.';chatHistory.push({role:'assistant',content:reply});updateMsg(tid,reply);}catch(e){updateMsg(tid,'Connection issue — try again.');}}
 function sendChip(el){document.getElementById('cinput').value=el.textContent;doChat();}
 function appendMsg(text,role){const id='m'+(++msgId);const el=document.createElement('div');el.className=`msg ${role}`;el.id=id;el.innerHTML=`<div class="mav ${role}">${role==='ai'?'AI':'ME'}</div><div class="mbub">${text}</div>`;document.getElementById('chat-msgs').appendChild(el);el.scrollIntoView({behavior:'smooth'});return id;}
 function updateMsg(id,text){const el=document.getElementById(id);if(el)el.querySelector('.mbub').textContent=text;el?.scrollIntoView({behavior:'smooth'});}
 let team='outbound';
-function sv(id,navEl,back){document.querySelectorAll('[id^="view-"]').forEach(v=>{v.className='view';v.style.display='none';});const el=document.getElementById('view-'+id);if(!el)return;if(id==='chat'){el.style.display='flex';el.classList.add('active');}else if(id==='agent-run'){el.style.display='block';}else{el.style.display='block';el.classList.add('active');}if(!back){document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));if(navEl)navEl.classList.add('active');}if(id==='playbooks')renderPlaybooks();if(id==='resources')renderResources();if(id==='pipeline')renderPipeBars();if(id==='home')loadCalendar();if(id==='leaderboard')renderLeaderboard();if(id==='attainment')renderAttainment();if(id==='funnel')renderFunnel();if(id==='segment')renderSegment();}
+function sv(id,navEl,back){document.querySelectorAll('[id^="view-"]').forEach(v=>{v.className='view';v.style.display='none';});const el=document.getElementById('view-'+id);if(!el)return;if(id==='chat'){el.style.display='flex';el.classList.add('active');}else if(id==='agent-run'){el.style.display='block';}else{el.style.display='block';el.classList.add('active');}if(!back){document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));if(navEl)navEl.classList.add('active');}if(id==='playbooks')renderPlaybooks();if(id==='resources')renderResources();if(id==='pipeline')renderPipeBars();if(id==='home')loadCalendar();if(id==='leaderboard'){refreshFromSheet();renderLeaderboard();}if(id==='attainment'){refreshFromSheet();renderAttainment();}if(id==='funnel')renderFunnel();if(id==='segment')renderSegment();}
 function setTeam(t,btn){team=t;document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const d=TEAMS[t];document.getElementById('qd').textContent=d.quota;document.getElementById('s1').textContent=d.s1;document.getElementById('s2').textContent=d.s2;document.getElementById('s3').textContent=d.s3;renderQBars(d.bars,'qbars');if(document.getElementById('view-playbooks').style.display!=='none')renderPlaybooks();}
 function renderQBars(bars,id){const el=document.getElementById(id);if(!el)return;el.innerHTML=bars.map(b=>`<div class="qbw"><div class="qbl"><span style="font-size:10px;color:var(--carbon-50);">${b.l}</span><span style="font-size:10px;font-weight:700;color:white;">${b.v}%</span></div><div class="qbt"><div class="qbf" style="width:${Math.min(b.v,100)}%;background:${b.c};"></div></div></div>`).join('');}
 function renderPlaybooks(){const p=PLAYBOOKS[team];document.getElementById('pgrid').innerHTML=p.map(x=>`<div class="pcard"><div class="pico">${x.i}</div><div class="pn">${x.n}</div><div class="pd">${x.d}</div><div class="pc">${x.c} →</div></div>`).join('');document.getElementById('psub').textContent=`${team.charAt(0).toUpperCase()+team.slice(1)} BDR`;}
@@ -428,12 +546,471 @@ function renderResources(){document.getElementById('rlist').innerHTML=RESOURCES.
 function renderPipeBars(){const bars=[{l:'Stage 1 — Prospecting',v:24,c:'var(--carbon-60)'},{l:'Stage 2 — SAO',v:8,c:'var(--brand)'},{l:'Stage 3 — Proposal',v:5,c:'var(--gem-60)'},{l:'Stage 4 — Negotiate',v:2,c:'var(--papaya-40)'},{l:'Closed Won',v:2,c:'var(--cilantro-40)'}];document.getElementById('plbars').innerHTML=bars.map(b=>`<div class="qbw"><div class="qbl"><span style="font-size:10px;color:var(--carbon-50);">${b.l}</span><span style="font-size:10px;font-weight:700;color:white;">${b.v} opps</span></div><div class="qbt"><div class="qbf" style="width:${(b.v/24)*100}%;background:${b.c};"></div></div></div>`).join('');}
 function chkTask(el){el.style.background='var(--brand)';el.style.borderColor='var(--brand)';el.innerHTML='<span style="color:white;font-size:8px;">✓</span>';setTimeout(()=>{el.parentElement.style.opacity='.4';},300);}
 function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-async function loadCalendar(){try{const now=new Date(),start=new Date(now.getFullYear(),now.getMonth(),now.getDate()).toISOString(),end=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59).toISOString();const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,system:`Use Google Calendar MCP to list events for today (${start} to ${end}). Return ONLY a JSON array: [{time,title,company,type}] where type: discovery,followup,demo,internal,other.`,messages:[{role:'user',content:'List my meetings today as JSON.'}],mcp_servers:MCP_SERVERS})});const data=await resp.json();const text=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('');const m=text?.match(/\[[\s\S]*\]/);if(m){renderCal(JSON.parse(m[0]));}else{renderCalFallback();}}catch(e){renderCalFallback();}}
+async function loadCalendar(){try{const now=new Date(),start=new Date(now.getFullYear(),now.getMonth(),now.getDate()).toISOString(),end=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59).toISOString();if(!ANTHROPIC_API_KEY){renderCalFallback();return;}const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,system:`You are a calendar assistant. The user wants their meetings for today (${start} to ${end}). Since you don't have live calendar access in this context, return a realistic empty array. Return ONLY a JSON array: [{time,title,company,type}] where type: discovery,followup,demo,internal,other. Return [] if no meetings available.`,messages:[{role:'user',content:'List my meetings today as JSON.'}]})});const data=await resp.json();const text=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('');const m=text?.match(/\[[\s\S]*\]/);if(m){renderCal(JSON.parse(m[0]));}else{renderCalFallback();}}catch(e){renderCalFallback();}}
 function renderCal(meetings){const card=document.getElementById('cal-card');const tagMap={discovery:'td',followup:'tf',demo:'tg'};const labelMap={discovery:'Discovery',followup:'Follow-up',demo:'Demo'};if(!meetings.length){card.innerHTML='<div class="hct">📅 Today\'s meetings <span class="live-badge">● Live</span></div><div style="font-size:11px;color:var(--carbon-60);">No meetings today.</div>';return;}card.innerHTML='<div class="hct">📅 Today\'s meetings <span class="live-badge">● Live</span></div>'+meetings.slice(0,5).map(m=>`<div class="mi"><div class="mtime">${m.time||''}</div><div><div class="mname">${m.title||''}</div><div class="mco">${m.company||''}</div></div>${m.type&&m.type!=='internal'?`<div class="mtag ${tagMap[m.type]||'td'}">${labelMap[m.type]||m.type}</div>`:''}</div>`).join('');}
 function renderCalFallback(){document.getElementById('cal-card').innerHTML=`<div class="hct">📅 Today's meetings</div><div class="mi"><div class="mtime">9:00am</div><div><div class="mname">Sarah Chen</div><div class="mco">Figma · VP of Ops</div></div><div class="mtag td">Discovery</div></div><div class="mi"><div class="mtime">11:30am</div><div><div class="mname">Marcus Reid</div><div class="mco">Brex · Head of Workplace</div></div><div class="mtag tf">Follow-up</div></div><div class="mi"><div class="mtime">2:00pm</div><div><div class="mname">Priya Nair</div><div class="mco">Stripe · Facilities Mgr</div></div><div class="mtag tg">Demo</div></div>`;}
+
+
+
+
+// ── LIVE GOOGLE SHEET DATA ────────────────────────────────────────────────────
+var SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQboVZBBD-3hBpuG77XAgnk1fG8kCwlKYZDB-P4cp0hgcq7EKOf2jwu7j9NsoRHqV3lBC6nsGIaM7wQ/pub?output=csv';
+var SHEET_DATA = null; // cached parsed data
+
+// Parse the Q2 FY27 sheet CSV into structured data
+function parseSheetCSV(csv){
+  var lines = csv.split('\n').map(function(l){ return l.split(',').map(function(c){ return c.replace(/^"|"$/g,'').trim(); }); });
+  var data = { outbound:{}, inbound:{}, channel:{} };
+
+  // We'll scan for rep names we know and extract their SAO quota + attainment
+  var repMap = {
+    'Querren':   {team:'outbound', key:'Querren Makasi'},
+    'Wilson':    {team:'outbound', key:'Wilson Prendergast'},
+    'Christian': {team:'outbound', key:'Christian Lyles'},
+    'Payton':    {team:'outbound', key:'Payton Cravalho'},
+    'Malaya':    {team:'inbound',  key:'Malaya Hood'},
+    'Wes':       {team:'inbound',  key:'Wes Porter'},
+    'Maria':     {team:'inbound',  key:'Maria Dacanay'},
+    'Lydia':     {team:'inbound',  key:'Lydia Kipre'},
+    'Grace':     {team:'inbound',  key:'Grace Leung'},
+    'Garrett':   {team:'inbound',  key:'Garrett Dinsmore'},
+    'Zairam':    {team:'inbound',  key:'Zairam Ramirez'},
+    'Herschel':  {team:'channel',  key:'Herschel Rojas'},
+  };
+
+  // Track which section (May/June/Q2) we're in based on row context
+  var currentSection = null;
+  var sections = {may:{outbound:{},inbound:{},channel:{}}, june:{outbound:{},inbound:{},channel:{}}, q2:{outbound:{},inbound:{},channel:{}}};
+
+  lines.forEach(function(row, ri){
+    var first = row[0] ? row[0].trim() : '';
+    var second = row[1] ? row[1].trim() : '';
+
+    // Detect section headers
+    if(first === '' && second.match(/May 2026/i)) { currentSection = 'may'; return; }
+    if(first === '' && second.match(/June 2026/i)) { currentSection = 'june'; return; }
+    if(first === '' && second.match(/Q2/i)) { currentSection = 'q2'; return; }
+    if(first === '' && second.match(/July 2026/i)) { currentSection = null; return; }
+
+    if(!currentSection) return;
+
+    // Look for rep rows
+    var repFirstName = first.replace(/\s+/g,'').split(',')[0];
+    // Try matching by first name
+    Object.keys(repMap).forEach(function(fname){
+      if(first.toLowerCase().startsWith(fname.toLowerCase())){
+        var info = repMap[fname];
+        var quota = parseInt(row[1]) || 0;
+        var attained = parseInt(row[2]) || 0;
+        var pctRaw = row[3] ? row[3].replace('%','').trim() : '0';
+        var pct = parseFloat(pctRaw) || (quota > 0 ? Math.round((attained/quota)*100) : 0);
+        if(quota > 0 || attained > 0){
+          sections[currentSection][info.team][info.key] = {
+            quota: quota,
+            attained: attained,
+            pct: pct
+          };
+        }
+      }
+    });
+  });
+
+  return sections;
+}
+
+function fetchSheetData(callback){
+  // Add cache-busting timestamp so we always get fresh data
+  var url = SHEET_CSV_URL + '&cachebust=' + Date.now();
+  fetch(url)
+    .then(function(r){ return r.text(); })
+    .then(function(csv){
+      SHEET_DATA = parseSheetCSV(csv);
+      if(callback) callback(SHEET_DATA);
+    })
+    .catch(function(err){
+      console.warn('Sheet fetch failed:', err);
+      if(callback) callback(null);
+    });
+}
+
+// Update leaderboard data from sheet
+function updateLeaderboardFromSheet(data){
+  if(!data) return;
+
+  // Update JUNE data
+  var juneOB = data.june.outbound;
+  var juneIB = data.june.inbound;
+  LB_JUNE.outbound.reps.forEach(function(rep){
+    var d = juneOB[rep.name] || juneIB[rep.name];
+    if(d){ rep.saos = d.attained; rep.saoQ = d.quota; }
+  });
+  LB_JUNE.inbound.reps.forEach(function(rep){
+    var d = juneIB[rep.name];
+    if(d){ rep.saos = d.attained; rep.saoQ = d.quota; }
+  });
+
+  // Update MAY data
+  var mayOB = data.may.outbound;
+  var mayIB = data.may.inbound;
+  LB_MAY.outbound.reps.forEach(function(rep){
+    var d = mayOB[rep.name] || mayIB[rep.name];
+    if(d){ rep.saos = d.attained; rep.saoQ = d.quota; }
+  });
+  LB_MAY.inbound.reps.forEach(function(rep){
+    var d = mayIB[rep.name];
+    if(d){ rep.saos = d.attained; rep.saoQ = d.quota; }
+  });
+
+  // Update Q2 data
+  var q2OB = data.q2.outbound;
+  var q2IB = data.q2.inbound;
+  LB_Q2.outbound.reps.forEach(function(rep){
+    var d = q2OB[rep.name] || q2IB[rep.name];
+    if(d){ rep.saos = d.attained; rep.saoQ = d.quota; }
+  });
+  LB_Q2.inbound.reps.forEach(function(rep){
+    var d = q2IB[rep.name];
+    if(d){ rep.saos = d.attained; rep.saoQ = d.quota; }
+  });
+}
+
+// Update attainment tracker from sheet
+function updateAttainmentFromSheet(data){
+  if(!data) return;
+  // Update May attainment numbers in AT_DATA (last month in the 6-month window)
+  var mayIB = data.may.inbound;
+  var mayOB = data.may.outbound;
+  AT_DATA.inbound.reps.forEach(function(rep){
+    var d = mayIB[rep.name];
+    if(d && typeof rep.months[5] === 'number'){
+      rep.months[5] = d.pct;
+    }
+  });
+  AT_DATA.outbound.reps.forEach(function(rep){
+    var d = mayOB[rep.name];
+    if(d && typeof rep.months[5] === 'number'){
+      rep.months[5] = d.pct;
+    }
+  });
+}
+
+// Update dashboard quota stat card
+function updateDashboardFromSheet(data){
+  if(!data || !CURRENT_REP) return;
+  var repName = CURRENT_REP.name;
+  var allSections = [data.june, data.may, data.q2];
+  var found = null;
+  allSections.forEach(function(sec){
+    if(found) return;
+    ['outbound','inbound','channel'].forEach(function(team){
+      if(sec[team][repName]) found = sec[team][repName];
+    });
+  });
+  if(found){
+    var s1el = document.getElementById('s1');
+    if(s1el) s1el.textContent = found.attained;
+    var qd = document.getElementById('qd');
+    if(qd) qd.textContent = found.pct + '%';
+  }
+}
+
+// Master refresh — call on load and whenever sheet might have changed
+function refreshFromSheet(){
+  var indicator = document.getElementById('sheet-indicator');
+  if(indicator){ indicator.textContent = 'Refreshing...'; indicator.style.color = 'var(--carbon-60)'; }
+
+  fetchSheetData(function(data){
+    if(!data){
+      if(indicator){ indicator.textContent = 'Sheet unavailable'; indicator.style.color = 'var(--papaya-40)'; }
+      return;
+    }
+    updateLeaderboardFromSheet(data);
+    updateAttainmentFromSheet(data);
+    updateDashboardFromSheet(data);
+
+    // Re-render any active views
+    if(document.getElementById('view-leaderboard').style.display !== 'none') renderLeaderboard();
+    if(document.getElementById('view-attainment').style.display !== 'none') renderAttainment();
+
+    var now = new Date();
+    var timeStr = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    if(indicator){ indicator.textContent = 'Sheet synced ' + timeStr; indicator.style.color = 'var(--cilantro-30)'; }
+  });
+}
+
+// ── MANAGER MODE ──────────────────────────────────────────────────────────────
+var MANAGER_MODE = false;
+var VIEWING_AS_REP = null; // when manager is viewing as a specific rep
+
+function applyManagerMode(rep){
+  MANAGER_MODE = true;
+  VIEWING_AS_REP = null;
+
+  // Show manager banner
+  var banner = document.getElementById('mgr-banner');
+  if(banner) banner.classList.add('active');
+  var bannerName = document.getElementById('mgr-banner-name');
+  if(bannerName) bannerName.textContent = rep.name;
+  var bannerSub = document.getElementById('mgr-banner-sub');
+  if(bannerSub) bannerSub.textContent = '· ' + rep.manages.join(' + ') + ' view · Full team access';
+
+  // Populate "view as rep" dropdown with their team's reps
+  var sel = document.getElementById('mgr-rep-select');
+  if(sel){
+    sel.innerHTML = '<option value="">Select a rep...</option>';
+    ALL_REPS.filter(function(r){
+      return rep.manages.indexOf(r.team) >= 0;
+    }).forEach(function(r, i){
+      var idx = ALL_REPS.indexOf(r);
+      var opt = document.createElement('option');
+      opt.value = idx;
+      opt.textContent = r.name + ' (' + r.team + ')';
+      sel.appendChild(opt);
+    });
+  }
+
+  // Update topbar
+  var av = document.querySelector('.av');
+  if(av){ av.textContent = rep.initials; av.style.background = rep.color+'33'; av.style.color = rep.color; }
+  var pill = document.getElementById('rep-topbar-pill');
+  if(pill){
+    pill.querySelector('.rep-pill-av').textContent = rep.initials;
+    pill.querySelector('.rep-pill-av').style.background = rep.color;
+    pill.querySelector('.rep-pill-name').textContent = rep.name + ' · Leader';
+  }
+
+  // Update dashboard for manager view
+  var vh = document.querySelector('#view-home .vh');
+  if(vh) vh.textContent = 'Good morning, ' + rep.name.split(' ')[0] + ' — here\'s your team.';
+  var vs = document.querySelector('#view-home .vs');
+  if(vs) vs.textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}) + ' · BDR Leader · ' + rep.manages.join(' + ');
+
+  // Chat greeting for manager
+  var chatGreet = document.querySelector('.msg.ai .mbub');
+  if(chatGreet) chatGreet.textContent = 'Hey ' + rep.name.split(' ')[0] + ' — I can help you with coaching, rep performance, pipeline analysis, 1:1 prep, or running agents on behalf of any rep. What do you need?';
+
+  // Show leaderboard and management views by default
+  loadCalendar();
+}
+
+function viewAsRep(){
+  var sel = document.getElementById('mgr-rep-select');
+  if(!sel || !sel.value) return;
+  var idx = parseInt(sel.value);
+  var rep = ALL_REPS[idx];
+  if(!rep) return;
+  VIEWING_AS_REP = rep;
+  CURRENT_REP = rep;
+
+  // Update banner to show "viewing as"
+  var bannerSub = document.getElementById('mgr-banner-sub');
+  if(bannerSub) bannerSub.innerHTML = '· <span style="color:var(--gem-30);">Viewing as ' + rep.name + '</span> · <span style="color:var(--carbon-60);cursor:pointer;" onclick="resetManagerView()">Back to team view ×</span>';
+
+  // Update greeting
+  var vh = document.querySelector('#view-home .vh');
+  if(vh) vh.textContent = 'Viewing as ' + rep.name + ' — ' + rep.team + ' BDR';
+  var vs = document.querySelector('#view-home .vs');
+  if(vs) vs.textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}) + ' · ' + rep.team + ' BDR';
+
+  loadCalendar();
+}
+
+function resetManagerView(){
+  VIEWING_AS_REP = null;
+  CURRENT_REP = CURRENT_REP.isManager ? CURRENT_REP : null;
+  // Re-apply manager view from session
+  var saved = sessionStorage.getItem('bdr_rep');
+  if(saved){
+    try{
+      var mgr = JSON.parse(saved);
+      if(mgr.isManager){ CURRENT_REP = mgr; applyManagerMode(mgr); return; }
+    } catch(e){}
+  }
+}
+
+// ── REP SELECTOR ──────────────────────────────────────────────────────────────
+var ALL_REPS = [
+  // Outbound
+  {name:'Malaya Hood',     initials:'MH', color:'#e91c1c', team:'Outbound', slack:'U0922950LQG', email:'malayahood@envoy.com'},
+  {name:'Wes Porter',      initials:'WP', color:'#4e4eda', team:'Outbound', slack:'U093Q5ZU46T', email:'weston@envoy.com'},
+  {name:'Payton Cravalho', initials:'PC', color:'#f76902', team:'Outbound', slack:'U09LJ24H9J7', email:'paytoncravalho@envoy.com'},
+  {name:'Christian Lyles', initials:'CL', color:'#21944e', team:'Outbound', slack:'U09HZQEFNET', email:'christian.lyles@envoy.com'},
+  {name:'Querren Makasi',  initials:'QM', color:'#7083ff', team:'Outbound', slack:'U09J1AY5Z8B', email:'querrenmakasie@envoy.com'},
+  {name:'Wilson Prendergast',initials:'WP2',color:'#4ec176',team:'Outbound',slack:'U09G6K74ZQA', email:'wilsonprendergast@envoy.com'},
+  // Inbound
+  {name:'Maria Dacanay',   initials:'MD', color:'#e91c1c', team:'Inbound',  slack:'U07L7RK58JZ', email:'mdacanay@envoy.com'},
+  {name:'Grace Leung',     initials:'GL', color:'#4e4eda', team:'Inbound',  slack:'U0AKH5FA2VD', email:'gleung@envoy.com'},
+  {name:'Zairam Ramirez',  initials:'ZR', color:'#f76902', team:'Inbound',  slack:'U0ANEG26PRD', email:'zairam.ramirez@envoy.com'},
+  {name:'Lydia Kipre',     initials:'LK', color:'#7083ff', team:'Inbound',  slack:'U09HT89B00P', email:'lydia@envoy.com'},
+  {name:'Garrett Dinsmore',initials:'GD', color:'#21944e', team:'Inbound',  slack:'U0ANTUJJ8ES', email:'garrett@envoy.com'},
+  // Channel
+  {name:'Herschel Rojas',  initials:'HR', color:'#4ec176', team:'Channel',  slack:'U0AFNJEJ537', email:'herschel@envoy.com'},
+  // Managers
+  {name:'Angela Rego',     initials:'AR', color:'#e91c1c', team:'Manager',  slack:'U07Q1E9TAPR', email:'arego@envoy.com',    isManager:true, manages:['Inbound','Channel']},
+  {name:'Dan MacDonald',   initials:'DM', color:'#4e4eda', team:'Manager',  slack:'U0AKWGW1GBG', email:'dmacdonald@envoy.com', isManager:true, manages:['Outbound']},
+];
+
+var CURRENT_REP = null;
+var selectedRepIdx = null;
+
+function initRepSelector(){
+  var saved = sessionStorage.getItem('bdr_rep');
+  if(saved){
+    try{
+      CURRENT_REP = JSON.parse(saved);
+      applyRep();
+      return;
+    } catch(e){}
+  }
+  buildRepModal();
+  document.getElementById('rep-modal').classList.remove('hidden');
+}
+
+function buildRepModal(){
+  var teams = ['Outbound','Inbound','Channel','Manager'];
+  var teamLabels = {Outbound:'Outbound BDR',Inbound:'Inbound BDR',Channel:'Channel Dev',Manager:'Managers'};
+  var html = '';
+  teams.forEach(function(team){
+    var reps = ALL_REPS.filter(function(r){return r.team===team;});
+    if(!reps.length) return;
+    html += '<div><div class="rs-team-label">'+teamLabels[team]+'</div><div class="rs-reps">';
+    reps.forEach(function(rep){
+      var idx = ALL_REPS.indexOf(rep);
+      html += '<div class="rs-rep" id="rs-rep-'+idx+'" onclick="selectRep('+idx+')">'
+        +'<div class="rs-av" style="background:'+rep.color+';">'+rep.initials+'</div>'
+        +'<div><div class="rs-name">'+rep.name+'</div><div class="rs-role">'+rep.email+'</div></div>'
+        +'</div>';
+    });
+    html += '</div></div>';
+  });
+  document.getElementById('rs-teams-container').innerHTML = html;
+}
+
+function selectRep(idx){
+  if(selectedRepIdx !== null){
+    var prev = document.getElementById('rs-rep-'+selectedRepIdx);
+    if(prev) prev.classList.remove('selected');
+  }
+  selectedRepIdx = idx;
+  var el = document.getElementById('rs-rep-'+idx);
+  if(el) el.classList.add('selected');
+  document.getElementById('rs-confirm-btn').disabled = false;
+}
+
+function confirmRep(){
+  if(selectedRepIdx === null) return;
+  CURRENT_REP = ALL_REPS[selectedRepIdx];
+  sessionStorage.setItem('bdr_rep', JSON.stringify(CURRENT_REP));
+  document.getElementById('rep-modal').classList.add('hidden');
+  applyRep();
+}
+
+function applyRep(){
+  if(!CURRENT_REP) return;
+  // Manager mode
+  if(CURRENT_REP.isManager){ applyManagerMode(CURRENT_REP); return; }
+  // Hide manager banner for reps
+  var banner = document.getElementById('mgr-banner');
+  if(banner) banner.classList.remove('active');
+  MANAGER_MODE = false;
+  // Update topbar avatar
+  var av = document.querySelector('.av');
+  if(av){
+    av.textContent = CURRENT_REP.initials;
+    av.style.background = CURRENT_REP.color+'33';
+    av.style.color = CURRENT_REP.color;
+  }
+  // Update rep pill
+  var pill = document.getElementById('rep-topbar-pill');
+  if(pill){
+    pill.querySelector('.rep-pill-av').textContent = CURRENT_REP.initials;
+    pill.querySelector('.rep-pill-av').style.background = CURRENT_REP.color;
+    pill.querySelector('.rep-pill-name').textContent = CURRENT_REP.name;
+  }
+  // Update dashboard greeting
+  var vh = document.querySelector('#view-home .vh');
+  if(vh) vh.textContent = 'Good morning, ' + CURRENT_REP.name.split(' ')[0] + ' — let\'s build pipeline.';
+  // Update dashboard sub
+  var vs = document.querySelector('#view-home .vs');
+  if(vs) vs.textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}) + ' · ' + CURRENT_REP.team + ' BDR';
+  // Update chat greeting
+  var chatGreet = document.querySelector('.msg.ai .mbub');
+  if(chatGreet) chatGreet.textContent = 'Hey ' + CURRENT_REP.name.split(' ')[0] + ' — I\'m your BDR AI assistant. Messaging, objections, discovery prep, account strategy, or Granola meeting notes — what are you working on?';
+  // Re-load calendar with rep context
+  loadCalendar();
+}
+
+function showRepModal(){
+  buildRepModal();
+  if(CURRENT_REP){
+    var idx = ALL_REPS.indexOf(CURRENT_REP);
+    if(idx >= 0) setTimeout(function(){ selectRep(idx); }, 50);
+  }
+  document.getElementById('rep-modal').classList.remove('hidden');
+}
+
+// ── API KEY MANAGEMENT ─────────────────────────────────────────────────────────
+var ANTHROPIC_API_KEY = '';
+
+function initApiKey(){
+  var saved = sessionStorage.getItem('bdr_api_key');
+  if(saved){
+    ANTHROPIC_API_KEY = saved;
+    updateKeyPill(true);
+  } else {
+    document.getElementById('apikey-modal').classList.remove('hidden');
+  }
+}
+function saveApiKey(){
+  var val = document.getElementById('ak-input').value.trim();
+  if(!val || !val.startsWith('sk-')){
+    document.getElementById('ak-input').style.borderColor='var(--red-40)';
+    document.getElementById('ak-input').placeholder='Must start with sk-ant-...';
+    return;
+  }
+  ANTHROPIC_API_KEY = val;
+  sessionStorage.setItem('bdr_api_key', val);
+  document.getElementById('apikey-modal').classList.add('hidden');
+  document.getElementById('ak-saved').classList.remove('hidden');
+  updateKeyPill(true);
+}
+function skipApiKey(){
+  document.getElementById('apikey-modal').classList.add('hidden');
+  updateKeyPill(false);
+}
+function showKeyModal(){
+  var input = document.getElementById('ak-input');
+  if(ANTHROPIC_API_KEY) input.value = ANTHROPIC_API_KEY;
+  document.getElementById('ak-saved').classList.toggle('hidden', !ANTHROPIC_API_KEY);
+  document.getElementById('apikey-modal').classList.remove('hidden');
+}
+function updateKeyPill(hasKey){
+  var pill = document.getElementById('key-pill');
+  var dot  = document.getElementById('key-dot');
+  var lbl  = document.getElementById('key-pill-label');
+  if(hasKey){
+    pill.className='key-pill set';
+    dot.style.background='var(--cilantro-30)';
+    lbl.textContent='API key active';
+  } else {
+    pill.className='key-pill unset';
+    dot.style.background='var(--red-40)';
+    lbl.textContent='No API key';
+  }
+}
+// Allow Enter key to save
+document.addEventListener('DOMContentLoaded', function(){
+  var inp = document.getElementById('ak-input');
+  if(inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') saveApiKey(); });
+});
+
 renderQBars(TEAMS.outbound.bars,'qbars');
 loadCalendar();
 updateMonitorUI(false);
+initApiKey();
+initRepSelector();
+refreshFromSheet();
+setInterval(refreshFromSheet, 5*60*1000); // refresh every 5 min
 // ── SEGMENT PIPELINE ──────────────────────────────────────────────────────────
 var SG_SEGS=['smb','mm','ent'];
 var SG_LABELS={smb:'SMB',mm:'Mid Market',ent:'Enterprise'};
