@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BDR AI Command Center</title>
+<style>
+  :root{--white:#ffffff;--carbon-20:#c9cbd4;--carbon-30:#a4a9b6;--carbon-40:#8a8f9e;--carbon-50:#717684;--carbon-60:#5c6270;--carbon-70:#3f4450;--carbon-80:#303541;--carbon-90:#1f232d;--carbon-95:#171a23;--gem-20:#bdcdff;--gem-30:#8fa5ff;--gem-40:#7083ff;--gem-60:#4e4eda;--gem-70:#4141a2;--gem-80:#31317c;--red-40:#fa4338;--red-50:#e91c1c;--red-55:#e40603;--cilantro-30:#4ec176;--cilantro-40:#21944e;--cilantro-60:#017939;--papaya-40:#f76902;--brand:var(--red-50);--border:rgba(255,255,255,0.07);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Sofia Pro',Arial,sans-serif;background:var(--carbon-95);color:var(--carbon-30);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+  .topbar{background:var(--carbon-90);border-bottom:1px solid var(--border);padding:0 18px;height:50px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .tl{display:flex;align-items:center;gap:10px;}
+  .logo{width:26px;height:26px;background:var(--brand);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:white;}
+  .ttitle{font-size:13px;font-weight:700;color:white;}.tsub{font-size:10px;color:var(--carbon-50);}
+  .team-toggle{display:flex;gap:2px;background:rgba(255,255,255,.05);border-radius:6px;padding:3px;}
+  .tbtn{padding:4px 11px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--carbon-50);background:transparent;border:none;cursor:pointer;transition:all 100ms;}
+  .tbtn.active{background:var(--brand);color:white;}
+  .tr{display:flex;align-items:center;gap:8px;}
+  .qpill{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.05);border-radius:20px;padding:3px 9px;font-size:10px;color:var(--carbon-40);}
+  .qdot{width:7px;height:7px;border-radius:50%;background:var(--cilantro-30);}
+  .qval{color:var(--cilantro-30);font-weight:700;}
+  .av{width:28px;height:28px;border-radius:50%;background:var(--gem-80);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--gem-20);}
+  .monitor-pill{display:none;align-items:center;gap:5px;background:rgba(78,193,118,.12);border:1px solid rgba(78,193,118,.25);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:600;color:var(--cilantro-30);}
+  .monitor-pill.active{display:flex;}
+  .monitor-pulse{width:6px;height:6px;border-radius:50%;background:var(--cilantro-30);animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.8);}}
+  .main{display:flex;flex:1;overflow:hidden;}
+  .sidebar{width:192px;flex-shrink:0;background:var(--carbon-90);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;padding:14px 0;}
+  .nl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--carbon-60);padding:0 14px 5px;}
+  .ni{display:flex;align-items:center;gap:8px;padding:6px 14px;font-size:12px;color:var(--carbon-50);cursor:pointer;border-left:2px solid transparent;transition:all 100ms;user-select:none;}
+  .ni:hover{background:rgba(255,255,255,.03);color:var(--carbon-20);}
+  .ni.active{background:rgba(233,28,28,.08);color:white;border-left-color:var(--brand);font-weight:600;}
+  .ni.monitor-active{background:rgba(78,193,118,.07);color:var(--cilantro-30);border-left-color:var(--cilantro-40);}
+  .ni .ic{font-size:14px;width:15px;text-align:center;flex-shrink:0;}
+  .bdg{margin-left:auto;background:var(--brand);color:white;font-size:9px;font-weight:700;padding:1px 5px;border-radius:20px;}
+  .bdg.b{background:var(--gem-70);}.bdg.g{background:var(--cilantro-40);}
+  .sdiv{height:1px;background:rgba(255,255,255,.04);margin:7px 14px;}
+  .content{flex:1;overflow-y:auto;background:var(--carbon-95);}
+  .view{padding:22px;display:none;}.view.active{display:block;}
+  #view-chat{display:none;flex-direction:column;height:100%;}#view-chat.active{display:flex;}
+  .vh{font-size:17px;font-weight:700;color:white;letter-spacing:-.01em;margin-bottom:3px;}
+  .vs{font-size:11px;color:var(--carbon-60);margin-bottom:18px;}
+  .srow{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:16px;}
+  .scard{background:var(--carbon-90);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+  .slbl{font-size:9px;color:var(--carbon-60);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+  .sval{font-size:21px;font-weight:700;color:white;letter-spacing:-.02em;}
+  .sdelta{font-size:9px;margin-top:2px;}.up{color:var(--cilantro-30);}.neu{color:var(--carbon-60);}
+  .hgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .hcard{background:var(--carbon-90);border:1px solid var(--border);border-radius:10px;padding:14px;}
+  .hct{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--carbon-60);margin-bottom:10px;display:flex;align-items:center;gap:5px;}
+  .mi{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+  .mi:last-child{border-bottom:none;}
+  .mtime{font-size:9px;color:var(--carbon-60);min-width:36px;padding-top:1px;}
+  .mname{font-size:11px;color:white;font-weight:500;}.mco{font-size:10px;color:var(--carbon-60);}
+  .mtag{margin-left:auto;padding:2px 6px;border-radius:2px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;}
+  .td{background:rgba(78,78,218,.18);color:var(--gem-30);}.tf{background:rgba(247,105,2,.15);color:var(--papaya-40);}.tg{background:rgba(33,148,78,.15);color:var(--cilantro-30);}
+  .ti{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+  .ti:last-child{border-bottom:none;}
+  .tck{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--carbon-60);flex-shrink:0;cursor:pointer;}
+  .tck:hover{border-color:var(--brand);}
+  .ttxt{font-size:11px;color:var(--carbon-40);flex:1;}.tdue{font-size:9px;color:var(--carbon-60);}.tdue.ov{color:var(--papaya-40);}
+  .sigrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+  .sig{display:flex;gap:8px;}
+  .sico{width:26px;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+  .si{background:rgba(78,78,218,.2);color:var(--gem-30);}.sj{background:rgba(247,105,2,.15);color:var(--papaya-40);}.sn{background:rgba(33,148,78,.15);color:var(--cilantro-30);}
+  .sco{font-size:11px;color:white;font-weight:500;}.sd{font-size:9px;color:var(--carbon-60);margin-top:1px;}
+  .qbw{margin-bottom:12px;}
+  .qbl{display:flex;justify-content:space-between;font-size:10px;margin-bottom:5px;}
+  .qbt{height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;}
+  .qbf{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.2,0,0,1);}
+  .agrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:16px;}
+  .acard{background:var(--carbon-90);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all 200ms;position:relative;overflow:hidden;}
+  .acard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--ac,var(--brand));opacity:0;transition:opacity 100ms;}
+  .acard:hover{border-color:rgba(255,255,255,.14);transform:translateY(-1px);}
+  .acard:hover::before{opacity:1;}
+  .acard.cs{opacity:.4;cursor:default;}.acard.cs:hover{transform:none;}
+  .aiw{width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:9px;}
+  .an{font-size:12px;font-weight:700;color:white;margin-bottom:3px;}
+  .ad{font-size:10px;color:var(--carbon-60);line-height:1.5;}
+  .amet{display:flex;align-items:center;gap:5px;margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,.05);}
+  .idot{width:16px;height:16px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:white;}
+  .live-pill{display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:20px;font-size:9px;font-weight:600;background:rgba(78,193,118,.15);color:var(--cilantro-30);}
+  .cs-pill{font-size:9px;font-weight:600;text-transform:uppercase;background:rgba(255,255,255,.05);color:var(--carbon-60);padding:2px 5px;border-radius:2px;margin-top:9px;display:inline-block;}
+  .rbtn{margin-left:auto;background:var(--brand);color:white;border:none;padding:3px 9px;border-radius:4px;font-size:9px;font-weight:700;cursor:pointer;text-transform:uppercase;}
+  .rbtn:hover{background:var(--red-55);}
+  .new-badge{font-size:8px;font-weight:700;text-transform:uppercase;background:rgba(78,78,218,.25);color:var(--gem-30);padding:2px 5px;border-radius:2px;margin-left:5px;}
+  .upgraded-badge{font-size:8px;font-weight:700;text-transform:uppercase;background:rgba(78,193,118,.2);color:var(--cilantro-30);padding:2px 5px;border-radius:2px;margin-left:5px;}
+  #view-agent-run{padding:22px;display:none;}
+  .arh{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+  .backbtn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--carbon-40);border-radius:4px;padding:4px 9px;font-size:10px;cursor:pointer;}
+  .backbtn:hover{background:rgba(255,255,255,.09);}
+  .obox{background:var(--carbon-90);border:1px solid var(--border);border-radius:10px;padding:18px;min-height:240px;font-size:12px;color:var(--carbon-30);line-height:1.7;overflow-y:auto;max-height:420px;}
+  .obox.loading{display:flex;align-items:center;gap:9px;color:var(--carbon-60);}
+  .spin{width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,.08);border-top-color:var(--brand);animation:spin .7s linear infinite;flex-shrink:0;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .oh{font-size:10px;font-weight:700;color:var(--carbon-60);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+  .os{margin-bottom:14px;}.ost{font-size:11px;font-weight:700;color:white;margin-bottom:5px;}
+  .oi{display:flex;gap:7px;padding:3px 0;font-size:11px;}.ob{color:var(--brand);flex-shrink:0;}
+  .arow{display:flex;gap:7px;margin-top:14px;flex-wrap:wrap;}
+  .abtn{padding:5px 12px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;border:none;transition:all 100ms;}
+  .abtn.p{background:var(--brand);color:white;}.abtn.p:hover{background:var(--red-55);}
+  .abtn.s{background:rgba(255,255,255,.05);color:var(--carbon-30);border:1px solid rgba(255,255,255,.1);}.abtn.s:hover{background:rgba(255,255,255,.09);}
+  .abtn:disabled{opacity:.5;cursor:not-allowed;}
+  .live-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:600;color:var(--cilantro-30);background:rgba(78,193,118,.1);border-radius:4px;padding:2px 6px;margin-left:8px;}
+  .reply-card{background:var(--carbon-90);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;}
+  .reply-card-header{padding:10px 14px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .reply-from{font-size:11px;font-weight:600;color:white;}.reply-subject{font-size:10px;color:var(--carbon-50);margin-top:1px;}
+  .reply-body-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--carbon-60);padding:10px 14px 6px;}
+  .reply-body{padding:0 14px 12px;font-size:11px;color:var(--carbon-40);line-height:1.6;font-style:italic;border-bottom:1px solid var(--border);}
+  .strategy-row{padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
+  .stag{padding:3px 8px;border-radius:3px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
+  .stag.grn{background:rgba(33,148,78,.12);color:var(--cilantro-30);}.stag.ora{background:rgba(247,105,2,.12);color:var(--papaya-40);}.stag.blu{background:rgba(78,78,218,.15);color:var(--gem-30);}
+  .draft-section{padding:12px 14px;}
+  .draft-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--cilantro-40);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .draft-editor{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--carbon-20);line-height:1.7;font-family:'Sofia Pro',Arial,sans-serif;resize:vertical;min-height:90px;outline:none;}
+  .draft-editor:focus{border-color:var(--gem-60);}
+  .draft-actions{display:flex;gap:7px;margin-top:10px;align-items:center;}
+  .success-banner{background:rgba(33,148,78,.12);border:1px solid rgba(33,148,78,.25);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .success-icon{font-size:18px;}.success-text{font-size:12px;color:var(--cilantro-30);font-weight:600;}.success-sub{font-size:10px;color:var(--cilantro-40);margin-top:2px;}
+  .gmail-link{font-size:11px;color:var(--gem-40);text-decoration:underline;cursor:pointer;margin-left:auto;flex-shrink:0;}
+  .chat-msgs{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px;}
+  .msg{display:flex;gap:9px;max-width:88%;}.msg.u{margin-left:auto;flex-direction:row-reverse;}
+  .mav{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;}
+  .mav.ai{background:var(--gem-80);color:var(--gem-20);}.mav.u{background:var(--carbon-80);color:var(--carbon-40);}
+  .mbub{padding:9px 12px;border-radius:6px;font-size:12px;line-height:1.6;}
+  .msg.ai .mbub{background:var(--carbon-90);border:1px solid var(--border);color:var(--carbon-20);}
+  .msg.u .mbub{background:var(--brand);color:white;}
+  .cinput-wrap{padding:14px 18px;border-top:1px solid var(--border);flex-shrink:0;}
+  .chips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+  .chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:var(--carbon-40);border-radius:20px;padding:3px 9px;font-size:10px;cursor:pointer;transition:all 100ms;}
+  .chip:hover{background:rgba(233,28,28,.12);border-color:var(--brand);color:white;}
+  .cform{display:flex;gap:7px;}
+  .cinput{flex:1;background:var(--carbon-80);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:9px 12px;font-size:12px;color:white;font-family:'Sofia Pro',Arial,sans-serif;outline:none;}
+  .cinput::placeholder{color:var(--carbon-60);}
+  .cinput:focus{border-color:var(--gem-60);}
+  .csend{background:var(--brand);color:white;border:none;border-radius:4px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;}
+  #view-monitor{padding:22px;display:none;}
+  .monitor-hero{background:var(--carbon-90);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:14px;display:flex;align-items:center;gap:24px;}
+  .monitor-icon-wrap{width:64px;height:64px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;transition:all 400ms;}
+  .monitor-icon-wrap.off{background:rgba(255,255,255,.05);}
+  .monitor-icon-wrap.on{background:rgba(78,193,118,.15);animation:glow 3s ease-in-out infinite;}
+  @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(78,193,118,0);}50%{box-shadow:0 0 0 8px rgba(78,193,118,.08);}}
+  .monitor-info{flex:1;}
+  .monitor-title{font-size:18px;font-weight:700;color:white;margin-bottom:4px;}
+  .monitor-status{font-size:12px;color:var(--carbon-50);margin-bottom:12px;}
+  .monitor-status.on{color:var(--cilantro-30);}
+  .monitor-toggle{padding:10px 24px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all 200ms;}
+  .monitor-toggle.start{background:var(--cilantro-40);color:white;}
+  .monitor-toggle.start:hover{background:var(--cilantro-60);}
+  .monitor-toggle.stop{background:rgba(233,28,28,.15);color:var(--red-40);border:1px solid rgba(233,28,28,.25);}
+  .monitor-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px;}
+  .mstat{background:var(--carbon-90);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+  .mstat-val{font-size:24px;font-weight:700;color:white;letter-spacing:-.02em;}
+  .mstat-lbl{font-size:9px;color:var(--carbon-60);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;}
+  .nfeed{background:var(--carbon-90);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .nfeed-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .nfeed-title{font-size:11px;font-weight:700;color:var(--carbon-50);text-transform:uppercase;letter-spacing:.06em;}
+  .nfeed-clear{font-size:10px;color:var(--carbon-60);cursor:pointer;background:none;border:none;padding:0;}
+  .nitem{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;}
+  .nitem:last-child{border-bottom:none;}.nitem:hover{background:rgba(255,255,255,.02);}
+  .nitem.new{background:rgba(78,193,118,.04);border-left:2px solid var(--cilantro-40);}
+  .nitem-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+  .nitem-body{flex:1;}
+  .nitem-from{font-size:12px;font-weight:600;color:white;}
+  .nitem-subject{font-size:10px;color:var(--carbon-50);margin-top:1px;}
+  .nitem-time{font-size:9px;color:var(--carbon-60);margin-left:auto;white-space:nowrap;padding-top:2px;}
+  .nitem-action{font-size:10px;font-weight:600;color:var(--cilantro-30);margin-top:4px;}
+  .empty-feed{padding:32px 16px;text-align:center;color:var(--carbon-60);font-size:12px;}
+  .config-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+  .config-card{background:var(--carbon-90);border:1px solid var(--border);border-radius:10px;padding:14px;}
+  .config-title{font-size:11px;font-weight:700;color:var(--carbon-50);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+  .config-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+  .config-row:last-child{border-bottom:none;}
+  .config-label{font-size:11px;color:var(--carbon-40);}
+  .config-val{font-size:11px;color:white;font-weight:500;}
+  .config-val.gem{color:var(--gem-40);}.config-val.grn{color:var(--cilantro-30);}
+  .confirmed-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;color:var(--cilantro-30);background:rgba(78,193,118,.15);border-radius:4px;padding:2px 7px;margin-left:6px;}
+  .pgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;}
+  .pcard{background:var(--carbon-90);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all 100ms;}
+  .pcard:hover{border-color:rgba(255,255,255,.14);}
+  .pico{font-size:18px;margin-bottom:7px;}.pn{font-size:12px;font-weight:700;color:white;margin-bottom:3px;}
+  .pd{font-size:10px;color:var(--carbon-60);line-height:1.5;}.pc{font-size:9px;color:var(--brand);margin-top:7px;font-weight:600;}
+  .rlist{display:flex;flex-direction:column;gap:5px;}
+  .rrow{display:flex;align-items:center;gap:10px;background:var(--carbon-90);border:1px solid var(--border);border-radius:6px;padding:9px 12px;cursor:pointer;transition:all 100ms;}
+  .rrow:hover{border-color:rgba(255,255,255,.14);}
+  .rico{font-size:14px;color:var(--carbon-60);width:16px;}.rn{font-size:11px;font-weight:600;color:white;flex:1;}.rt{font-size:9px;color:var(--carbon-70);}
+  .ophase{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px;}
+  .opc{background:var(--carbon-90);border:1px solid var(--border);border-radius:10px;padding:14px;}
+  .opl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--carbon-60);margin-bottom:5px;}
+  .opt{font-size:12px;font-weight:700;color:white;margin-bottom:7px;}
+  .opi{display:flex;gap:5px;font-size:10px;color:var(--carbon-50);padding:2px 0;}
+  .opi::before{content:'→';color:var(--brand);flex-shrink:0;}
+  .pl3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px;}
+  ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px;}
+  .obox b{color:white;}.obox em{color:var(--carbon-50);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="tl"><div class="logo">E</div><div><div class="ttitle">BDR AI Command Center</div><div class="tsub">Envoy Sales Development</div></div></div>
+  <div class="team-toggle"><button class="tbtn active" onclick="setTeam('outbound',this)">Outbound</button><button class="tbtn" onclick="setTeam('inbound',this)">Inbound</button><button class="tbtn" onclick="setTeam('channel',this)">Channel</button></div>
+  <div class="tr"><div class="monitor-pill" id="monitor-topbar-pill"><div class="monitor-pulse"></div><span>Monitor active</span></div><div class="qpill"><div class="qdot"></div><span>Quota MTD</span><span class="qval" id="qd">113%</span></div><div class="av">AR</div></div>
+</div>
+<div class="main">
+  <nav class="sidebar">
+    <div style="margin-bottom:16px;"><div class="nl">Overview</div><div class="ni active" onclick="sv('home',this)"><span class="ic">⚡</span>Dashboard</div></div>
+    <div class="sdiv"></div>
+    <div style="margin-bottom:16px;margin-top:10px;"><div class="nl">AI Tools</div><div class="ni" onclick="sv('chat',this)"><span class="ic">💬</span>AI Assistant</div><div class="ni" onclick="sv('agents',this)"><span class="ic">🤖</span>Agents<span class="bdg">11</span></div><div class="ni" id="monitor-nav" onclick="sv('monitor',this)"><span class="ic">📡</span>Monitor<span class="bdg g" id="monitor-badge" style="display:none;">ON</span></div></div>
+    <div class="sdiv"></div>
+    <div style="margin-bottom:16px;margin-top:10px;"><div class="nl">Enablement</div><div class="ni" onclick="sv('playbooks',this)"><span class="ic">📋</span>Playbooks</div><div class="ni" onclick="sv('onboard',this)"><span class="ic">🎯</span>Onboarding</div><div class="ni" onclick="sv('resources',this)"><span class="ic">📂</span>Resources<span class="bdg b">12</span></div></div>
+    <div class="sdiv"></div>
+    <div style="margin-top:10px;"><div class="nl">Performance</div><div class="ni" onclick="sv('leaderboard',this)"><span class="ic">🏆</span>Leaderboard</div><div class="ni" onclick="sv('attainment',this)"><span class="ic">📈</span>Attainment</div><div class="ni" onclick="sv('funnel',this)"><span class="ic">🔽</span>Funnel</div><div class="ni" onclick="sv('segment',this)"><span class="ic">🎯</span>Segments</div><div class="ni" onclick="sv('pipeline',this)"><span class="ic">📊</span>My Pipeline</div></div>
+  </nav>
+  <div class="content">
+    <div id="view-home" class="view active">
+      <div class="vh">Good morning — let's build pipeline.</div><div class="vs">Outbound BDR · Envoy Sales Development</div>
+      <div class="srow"><div class="scard"><div class="slbl">SAOs MTD</div><div class="sval" id="s1">8</div><div class="sdelta up">↑ 60% to goal</div></div><div class="scard"><div class="slbl">Pipeline Created</div><div class="sval" id="s2">$94k</div><div class="sdelta up">↑ 12% vs last mo</div></div><div class="scard"><div class="slbl">Meetings Booked</div><div class="sval" id="s3">11</div><div class="sdelta neu">Target: 12</div></div><div class="scard"><div class="slbl">Sequence Steps</div><div class="sval">147</div><div class="sdelta up">↑ On pace</div></div></div>
+      <div class="hcard" style="margin-bottom:10px;"><div class="hct">⚡ Quota attainment — MTD</div><div id="qbars"></div></div>
+      <div class="hgrid">
+        <div class="hcard" id="cal-card"><div class="hct">📅 Today's meetings <span class="live-badge">● Live</span></div><div style="display:flex;align-items:center;gap:7px;color:var(--carbon-60);font-size:11px;"><div class="spin"></div>Loading from Calendar...</div></div>
+        <div class="hcard"><div class="hct">✅ Tasks due today</div><div class="ti"><div class="tck" onclick="chkTask(this)"></div><div class="ttxt">Send follow-up to Marcus Reid</div><div class="tdue ov">Overdue</div></div><div class="ti"><div class="tck" onclick="chkTask(this)"></div><div class="ttxt">Add 10 accounts to Outreach sequence</div><div class="tdue">Today</div></div><div class="ti"><div class="tck" onclick="chkTask(this)"></div><div class="ttxt">Update Salesforce — 3 pending stage moves</div><div class="tdue">Today</div></div><div class="ti"><div class="tck" onclick="chkTask(this)"></div><div class="ttxt">Review pre-call brief before next disco</div><div class="tdue">Before mtg</div></div><div class="ti"><div class="tck" onclick="chkTask(this)"></div><div class="ttxt">Log call notes from yesterday</div><div class="tdue">EOD</div></div></div>
+        <div class="hcard" style="grid-column:span 2;"><div class="hct">🔥 Live signals — your accounts</div><div class="sigrow"><div class="sig"><div class="sico si">📈</div><div><div class="sco">Figma</div><div class="sd">High intent · 3 new Workplace Ops hires</div></div></div><div class="sig"><div class="sico sj">💼</div><div><div class="sco">Robinhood</div><div class="sd">Hiring Head of Real Estate + Facilities</div></div></div><div class="sig"><div class="sico sn">📰</div><div><div class="sco">Brex</div><div class="sd">Office expansion — SF + NYC announced</div></div></div></div></div>
+      </div>
+    </div>
+    <div id="view-agents" class="view">
+      <div class="vh">Agents</div><div class="vs">Live: Gmail · Calendar · ZoomInfo · Slack · Drive · Granola</div>
+      <div class="agrid">
+        <div class="acard" style="--ac:#e91c1c;" onclick="runAgent('inbox')"><div class="aiw" style="background:rgba(233,28,28,.13);">📬</div><div class="an">Daily Inbox Brief</div><div class="ad">Scans Gmail for unread prospect emails, flags replies needing action.</div><div class="amet"><div class="idot" style="background:#EA4335;">G</div><span class="live-pill">● Live</span><button class="rbtn" onclick="event.stopPropagation();runAgent('inbox')">Run →</button></div></div>
+        <div class="acard" style="--ac:#f76902;" onclick="runAgent('tasks')"><div class="aiw" style="background:rgba(247,105,2,.12);">✅</div><div class="an">Outstanding Tasks</div><div class="ad">Pulls overdue threads from Gmail + Calendar — prioritized by urgency.</div><div class="amet"><div class="idot" style="background:#EA4335;">G</div><div class="idot" style="background:#4285F4;">C</div><span class="live-pill">● Live</span><button class="rbtn" onclick="event.stopPropagation();runAgent('tasks')">Run →</button></div></div>
+        <div class="acard" style="--ac:#4e4eda;border-color:rgba(78,78,218,.3);" onclick="runAgent('reply')"><div class="aiw" style="background:rgba(78,78,218,.14);">↩️</div><div class="an">Reply Agent <span class="upgraded-badge">↑ Gmail Drafts</span></div><div class="ad">Reads prospect replies, drafts a strategic response, saves to Gmail Drafts.</div><div class="amet"><div class="idot" style="background:#EA4335;">G</div><span class="live-pill">● Live</span><button class="rbtn" onclick="event.stopPropagation();runAgent('reply')">Run →</button></div></div>
+        <div class="acard" style="--ac:#21944e;" onclick="runAgent('brief')"><div class="aiw" style="background:rgba(33,148,78,.12);">🎯</div><div class="an">Discovery Meeting Brief</div><div class="ad">Calendar + ZoomInfo + Granola past meeting history.</div><div class="amet"><div class="idot" style="background:#4285F4;">C</div><div class="idot" style="background:#5C6270;">ZI</div><div class="idot" style="background:#6B5EFF;">GR</div><span class="live-pill">● Live</span><button class="rbtn" onclick="event.stopPropagation();runAgent('brief')">Run →</button></div></div>
+        <div class="acard" style="--ac:#6b5eff;" onclick="runAgent('debrief')"><div class="aiw" style="background:rgba(107,94,255,.15);">📝</div><div class="an">Post-Call Debrief <span class="new-badge">Granola</span></div><div class="ad">Granola notes → MEDDIC signals, action items, Salesforce-ready output.</div><div class="amet"><div class="idot" style="background:#6B5EFF;">GR</div><span class="live-pill">● Live</span><button class="rbtn" onclick="event.stopPropagation();runAgent('debrief')">Run →</button></div></div>
+        <div class="acard" style="--ac:#6b5eff;" onclick="runAgent('history')"><div class="aiw" style="background:rgba(107,94,255,.15);">🗂️</div><div class="an">Meeting History Lookup <span class="new-badge">Granola</span></div><div class="ad">All past Granola notes for an account — themes, objections, relationship health.</div><div class="amet"><div class="idot" style="background:#6B5EFF;">GR</div><span class="live-pill">● Live</span><button class="rbtn" onclick="event.stopPropagation();runAgent('history')">Run →</button></div></div>
+        <div class="acard" style="--ac:#e91c1c;" onclick="runAgent('signal')"><div class="aiw" style="background:rgba(233,28,28,.12);">🔥</div><div class="an">Signal Agent</div><div class="ad">ZoomInfo intent signals and scoops — who to reach out to today.</div><div class="amet"><div class="idot" style="background:#5C6270;">ZI</div><span class="live-pill">● Live</span><button class="rbtn" onclick="event.stopPropagation();runAgent('signal')">Run →</button></div></div>
+        <div class="acard" style="--ac:#4e4eda;" onclick="runAgent('sequence')"><div class="aiw" style="background:rgba(78,78,218,.12);">✍️</div><div class="an">Sequence Builder</div><div class="ad">Personalized 6-step sequence from company + persona with live ZoomInfo data.</div><div class="amet"><div class="idot" style="background:#5C6270;">ZI</div><span class="live-pill">● Live</span><button class="rbtn" onclick="event.stopPropagation();runAgent('sequence')">Run →</button></div></div>
+        <div class="acard cs"><div class="aiw" style="background:rgba(113,118,132,.1);">🎙️</div><div class="an">Call Coach</div><div class="ad">Reviews Chorus recordings — talk ratio, objection handling, next steps.</div><span class="cs-pill">Coming soon · Chorus</span></div>
+        <div class="acard cs"><div class="aiw" style="background:rgba(113,118,132,.1);">📞</div><div class="an">Nooks Power Dialer Brief</div><div class="ad">Talk track and snapshot for your next Nooks session.</div><span class="cs-pill">Coming soon · Nooks</span></div>
+        <div class="acard cs"><div class="aiw" style="background:rgba(113,118,132,.1);">🔍</div><div class="an">Navigator Prospector</div><div class="ad">Sales Navigator target list using Envoy ICP filters.</div><span class="cs-pill">Coming soon · Sales Navigator</span></div>
+      </div>
+    </div>
+    <div id="view-agent-run" style="padding:22px;display:none;">
+      <div class="arh"><button class="backbtn" onclick="sv('agents',null,true)">← Agents</button><div><div class="vh" id="run-title" style="font-size:15px;margin-bottom:1px;"></div><div class="vs" id="run-sub" style="margin-bottom:0;"></div></div><div id="run-badge" style="margin-left:8px;"></div></div>
+      <div id="regular-output"><div class="obox loading" id="agent-out"><div class="spin"></div><span>Connecting...</span></div><div class="arow" id="agent-acts" style="display:none;"></div></div>
+      <div id="reply-output" style="display:none;"><div id="reply-loading" style="display:flex;align-items:center;gap:9px;color:var(--carbon-60);font-size:12px;padding:20px 0;"><div class="spin"></div><span id="reply-status">Scanning Gmail...</span></div><div id="reply-content" style="display:none;"></div></div>
+    </div>
+    <div id="view-monitor">
+      <div class="vh">Monitor <span id="monitor-mode-label" style="font-size:13px;font-weight:400;color:var(--carbon-60);">— Inactive</span></div>
+      <div class="vs">Polls Gmail every 5 min while this tab is open. Zapier handles 24/7 coverage.</div>
+      <div class="monitor-hero">
+        <div class="monitor-icon-wrap off" id="monitor-icon-wrap">📡</div>
+        <div class="monitor-info">
+          <div class="monitor-title" id="monitor-hero-title">Start monitoring your inbox</div>
+          <div class="monitor-status" id="monitor-hero-status">Inactive — click Start to poll Gmail every 5 minutes for new external prospect replies.</div>
+          <div style="display:flex;gap:8px;margin-top:12px;align-items:center;"><button class="monitor-toggle start" id="monitor-toggle-btn" onclick="toggleMonitor()">▶ Start Monitor</button><span id="next-poll-label" style="font-size:10px;color:var(--carbon-60);display:none;">Next poll in <b id="next-poll-countdown" style="color:var(--carbon-30);">5:00</b></span></div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:10px;color:var(--carbon-60);margin-bottom:4px;">Immediate alert</div>
+          <div style="font-size:11px;color:var(--gem-40);font-weight:600;">Slack DM to rep (@here)</div>
+          <div style="font-size:10px;color:var(--carbon-60);margin-top:8px;">Escalation channel</div>
+          <div style="font-size:11px;color:var(--cilantro-30);font-weight:600;">#bdr-management-notifications <span class="confirmed-badge">✓ live</span></div>
+          <div style="font-size:10px;color:var(--carbon-60);margin-top:8px;">Escalation after</div>
+          <div style="font-size:11px;color:var(--papaya-40);font-weight:600;">60 minutes (@here)</div>
+        </div>
+      </div>
+      <div class="monitor-stats"><div class="mstat"><div class="mstat-val" id="mstat-scanned">0</div><div class="mstat-lbl">Emails scanned this session</div></div><div class="mstat"><div class="mstat-val" id="mstat-detected">0</div><div class="mstat-lbl">Prospect replies detected</div></div><div class="mstat"><div class="mstat-val" id="mstat-slacked">0</div><div class="mstat-lbl">Slack DMs sent</div></div></div>
+      <div class="nfeed"><div class="nfeed-header"><div class="nfeed-title">📬 Detected prospect replies</div><button class="nfeed-clear" onclick="clearFeed()">Clear</button></div><div id="nfeed-items"><div class="empty-feed" id="nfeed-empty">No prospect replies detected yet. Start the monitor to begin watching your inbox.</div></div></div>
+      <div class="config-grid">
+        <div class="config-card"><div class="config-title">Monitor settings</div><div class="config-row"><span class="config-label">Poll interval</span><span class="config-val">Every 5 minutes</span></div><div class="config-row"><span class="config-label">Email filter</span><span class="config-val">External only (no @envoy.com)</span></div><div class="config-row"><span class="config-label">Lookback window</span><span class="config-val">Last 15 minutes</span></div><div class="config-row"><span class="config-label">Browser notifications</span><span class="config-val grn" id="notif-perm-status">Checking...</span></div></div>
+        <div class="config-card"><div class="config-title">Notification routing</div><div class="config-row"><span class="config-label">Immediate alert</span><span class="config-val gem">Slack DM + @here</span></div><div class="config-row"><span class="config-label">Escalation channel</span><span class="config-val grn">#bdr-management-notifications ✓</span></div><div class="config-row"><span class="config-label">Channel ID</span><span class="config-val" style="font-family:monospace;font-size:10px;color:var(--carbon-50);">C0B7P2SNESZ</span></div><div class="config-row"><span class="config-label">Escalation trigger</span><span class="config-val">No reply sent in 60 min + @here</span></div><div class="config-row"><span class="config-label">24/7 coverage</span><span class="config-val gem">Zapier automation ✓</span></div></div>
+      </div>
+    </div>
+    <div id="view-chat"><div class="chat-msgs" id="chat-msgs"><div class="msg ai"><div class="mav ai">AI</div><div class="mbub">Hey — I'm your BDR AI assistant inside the Command Center. Messaging, objections, discovery prep, account strategy, or Granola meeting notes — what are you working on?</div></div></div><div class="cinput-wrap"><div class="chips" id="chips"><div class="chip" onclick="sendChip(this)">Handle a "not interested" reply</div><div class="chip" onclick="sendChip(this)">Write a cold email for Figma, Ops persona</div><div class="chip" onclick="sendChip(this)">What came up in my last discovery call?</div><div class="chip" onclick="sendChip(this)">Best first touch for a warm inbound?</div></div><div class="cform"><input class="cinput" id="cinput" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')doChat()"/><button class="csend" onclick="doChat()">Send</button></div></div></div>
+    <div id="view-playbooks" class="view"><div class="vh">Playbooks</div><div class="vs" id="psub">Outbound BDR</div><div class="pgrid" id="pgrid"></div></div>
+    <div id="view-onboard" class="view"><div class="vh">Onboarding Track</div><div class="vs">30/60/90 day ramp for Outbound BDR</div><div class="ophase"><div class="opc"><div class="opl">Day 1–30</div><div class="opt">Foundation</div><div class="opi">Product + ICP deep dive</div><div class="opi">Envoy value prop mastery</div><div class="opi">Tool setup (Outreach, SFDC, ZI)</div><div class="opi">Shadow 3 discovery calls</div><div class="opi">First 10 personalized emails</div></div><div class="opc"><div class="opl">Day 31–60</div><div class="opt">Ramp</div><div class="opi">Own outreach calendar</div><div class="opi">50% of full sequence volume</div><div class="opi">First booked SAOs</div><div class="opi">Objection handling drills</div><div class="opi">Weekly 1:1 with manager</div></div><div class="opc"><div class="opl">Day 61–90</div><div class="opt">Full Quota</div><div class="opi">100% quota carrying</div><div class="opi">Own account territory</div><div class="opi">Cross-functional collab</div><div class="opi">Pipeline review with AE</div><div class="opi">AE Ready track eligibility</div></div></div><div class="hcard"><div class="hct">🎯 AE Ready Development Program</div><div style="font-size:11px;color:var(--carbon-50);line-height:1.7;">A 9–12 month track from Outbound BDR → SMB AE. Three phases: Sales Craft, Deal Mechanics, and Full Cycle Simulation.</div></div></div>
+    <div id="view-resources" class="view"><div class="vh">Resources</div><div class="vs">Your Google Drive docs, templates, and reference materials.</div><div class="rlist" id="rlist"></div></div>
+    <div id="view-leaderboard" class="view">
+  <div class="vh">Leaderboard</div>
+  <div class="vs" id="lb-period-sub">June 2026 · All teams · Monthly SAO attainment</div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+    <div style="display:flex;gap:3px;background:rgba(255,255,255,.04);border-radius:7px;padding:3px;">
+      <button class="abtn s" id="lptab-may" onclick="setLBPeriod('may',this)" style="font-size:10px;padding:4px 12px;">May 2026</button>
+      <button class="abtn p" id="lptab-june" onclick="setLBPeriod('june',this)" style="font-size:10px;padding:4px 12px;">June 2026</button>
+      <button class="abtn s" id="lptab-q2" onclick="setLBPeriod('q2',this)" style="font-size:10px;padding:4px 12px;background:var(--gem-70);color:white;">Q2 FY27</button>
+    </div>
+    <div style="display:flex;gap:4px;">
+      <button class="abtn p" id="lmtab-sao" onclick="setLBMetric('sao',this)" style="font-size:10px;padding:4px 10px;">SAO Attainment</button>
+      <button class="abtn s" id="lmtab-sql" onclick="setLBMetric('sql',this)" style="font-size:10px;padding:4px 10px;">SQLs</button>
+      <button class="abtn s" id="lmtab-arr" onclick="setLBMetric('arr',this)" style="font-size:10px;padding:4px 10px;">ARR</button>
+    </div>
+  </div>
+
+  <div id="lb-boards" style="display:grid;grid-template-columns:1fr 1.35fr 0.5fr;gap:9px;margin-bottom:12px;"></div>
+
+  <div style="display:flex;gap:14px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--carbon-60);"><div style="width:7px;height:7px;border-radius:50%;background:var(--cilantro-30);"></div>100%+ attainment</div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--carbon-60);"><div style="width:7px;height:7px;border-radius:50%;background:white;"></div>70–99%</div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--carbon-60);"><div style="width:7px;height:7px;border-radius:50%;background:var(--papaya-40);"></div>40–69%</div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--carbon-60);"><div style="width:7px;height:7px;border-radius:50%;background:var(--red-40);"></div>Below 40%</div>
+  </div>
+</div>
+
+<div id="view-attainment" class="view">
+  <div class="vh">6-Month Attainment Tracker</div>
+  <div class="vs">Dec 2025 – May 2026 · Rolling window · Promo eligibility = 100%+ average</div>
+
+  <div class="hcard" style="margin-bottom:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div style="font-size:11px;color:var(--carbon-50);line-height:1.6;"><b style="color:white;">Eligibility rule:</b> 100%+ rolling average across the last 6 completed months. Ramp months excluded from calculation. Reps with fewer than 3 months of quota data marked as Insufficient data.</div>
+    <div style="display:flex;gap:16px;flex-shrink:0;">
+      <div style="text-align:center;"><div class="sval" id="at-eligible" style="color:var(--cilantro-30);">—</div><div class="slbl">Eligible</div></div>
+      <div style="text-align:center;"><div class="sval" id="at-close" style="color:var(--gem-40);">—</div><div class="slbl">Close</div></div>
+      <div style="text-align:center;"><div class="sval" id="at-building" style="color:var(--papaya-40);">—</div><div class="slbl">Building</div></div>
+    </div>
+  </div>
+
+  <div id="at-outbound" style="margin-bottom:14px;"></div>
+  <div id="at-inbound" style="margin-bottom:14px;"></div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;">
+    <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--carbon-60);"><div style="width:26px;height:12px;border-radius:2px;background:rgba(78,193,118,.18);"></div>100%+</div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--carbon-60);"><div style="width:26px;height:12px;border-radius:2px;background:rgba(78,78,218,.15);"></div>80–99%</div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--carbon-60);"><div style="width:26px;height:12px;border-radius:2px;background:rgba(255,143,51,.12);"></div>60–79%</div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--carbon-60);"><div style="width:26px;height:12px;border-radius:2px;background:rgba(233,28,28,.12);"></div>Below 60%</div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--carbon-60);"><div style="width:26px;height:12px;border-radius:2px;background:rgba(255,255,255,.04);"></div>Ramp / N/A</div>
+  </div>
+</div>
+
+<div id="view-funnel" class="view">
+  <div class="vh">Funnel Conversion Tracker</div>
+  <div class="vs">SQL → SAO → Stage 3+ → Closed Won / Lost · Per rep by team</div>
+
+  <div style="display:flex;gap:3px;background:rgba(255,255,255,.04);border-radius:7px;padding:3px;margin-bottom:14px;width:fit-content;">
+    <button class="abtn s" onclick="setFunnelWindow('jun',this)" style="font-size:10px;padding:4px 10px;">June</button>
+    <button class="abtn s" onclick="setFunnelWindow('q2',this)" style="font-size:10px;padding:4px 10px;">Q2 FY27</button>
+    <button class="abtn p" id="fwtab-q1" onclick="setFunnelWindow('q1',this)" style="font-size:10px;padding:4px 10px;">Q1 FY27</button>
+    <button class="abtn s" onclick="setFunnelWindow('fy27',this)" style="font-size:10px;padding:4px 10px;">FY27 to Date</button>
+    
+  </div>
+
+  <div style="display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap;">
+    <div class="scard" style="flex:1;min-width:80px;"><div class="slbl">Total SQLs</div><div class="sval" id="fh-sqls" style="color:var(--gem-30);">—</div></div>
+    <div class="scard" style="flex:1;min-width:80px;"><div class="slbl">Total SAOs</div><div class="sval" id="fh-saos" style="color:var(--red-40);">—</div></div>
+    <div class="scard" style="flex:1;min-width:80px;"><div class="slbl">SQL→SAO %</div><div class="sval" id="fh-conv" style="color:var(--papaya-40);">—</div></div>
+    <div class="scard" style="flex:1;min-width:80px;"><div class="slbl">Closed Won</div><div class="sval" id="fh-won" style="color:var(--cilantro-30);">—</div></div>
+  </div>
+
+  <div class="hcard" style="margin-bottom:10px;padding:10px 14px;font-size:11px;color:var(--carbon-50);line-height:1.6;">
+    <b style="color:white;">Benchmarks (FY27 IB):</b> SQL→SAO 82% · SAO→Stage 3+ ~65% · Stage 3+→Won ~55%
+    &nbsp;·&nbsp;<span style="color:var(--cilantro-30);">■</span> ≥benchmark &nbsp;<span style="color:var(--gem-30);">■</span> 75%+ &nbsp;<span style="color:var(--papaya-40);">■</span> 50%+ &nbsp;<span style="color:var(--red-40);">■</span> Below 50%
+  </div>
+
+  <div id="funnel-outbound" style="margin-bottom:18px;"></div>
+  <div id="funnel-inbound" style="margin-bottom:18px;"></div>
+</div>
+
+<div id="view-segment" class="view">
+  <div class="vh">Segment Pipeline</div>
+  <div class="vs">SMB · Mid Market · Enterprise · Full funnel by team and rep</div>
+
+  <div style="display:flex;gap:3px;background:rgba(255,255,255,.04);border-radius:7px;padding:3px;margin-bottom:14px;width:fit-content;">
+    <button class="abtn s" onclick="setSegWindow('jun',this)" style="font-size:10px;padding:4px 10px;">June</button>
+    <button class="abtn s" onclick="setSegWindow('q2',this)"  style="font-size:10px;padding:4px 10px;">Q2 FY27</button>
+    <button class="abtn p" id="swtab-q1" onclick="setSegWindow('q1',this)" style="font-size:10px;padding:4px 10px;">Q1 FY27</button>
+    <button class="abtn s" onclick="setSegWindow('fy27',this)" style="font-size:10px;padding:4px 10px;">FY27 to Date</button>
+  </div>
+
+  <div style="display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap;">
+    <div class="scard" style="flex:1;min-width:80px;"><div class="slbl">Total SQLs</div><div class="sval" id="sg-sqls" style="color:var(--gem-30);">—</div></div>
+    <div class="scard" style="flex:1;min-width:80px;"><div class="slbl">Total SAOs</div><div class="sval" id="sg-saos" style="color:var(--red-40);">—</div></div>
+    <div class="scard" style="flex:1;min-width:80px;"><div class="slbl">Total ARR</div><div class="sval" id="sg-arr" style="color:var(--cilantro-30);">—</div></div>
+    <div class="scard" style="flex:1;min-width:80px;"><div class="slbl">Closed Won</div><div class="sval" id="sg-won" style="color:var(--cilantro-30);">—</div></div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;" id="sg-overview"></div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    <div id="sg-outbound"></div>
+    <div id="sg-inbound"></div>
+  </div>
+</div>
+
+<div id="view-pipeline" class="view"><div class="vh">My Pipeline</div><div class="vs">Outbound BDR · FY27</div><div class="pl3"><div class="scard"><div class="slbl">Stage 2 (SAO)</div><div class="sval">8</div><div class="sdelta up">↑ 3 this week</div></div><div class="scard"><div class="slbl">Stage 3+ Pipeline</div><div class="sval">$186k</div><div class="sdelta neu">Avg deal $23k</div></div><div class="scard"><div class="slbl">Closed Won (BDR-sourced)</div><div class="sval">2</div><div class="sdelta up">↑ $47k ARR</div></div></div><div class="hcard"><div class="hct">📈 Stage breakdown</div><div id="plbars"></div></div></div>
+  </div>
+</div>
+<script>
+const MCP_SERVERS=[{type:"url",url:"https://gmailmcp.googleapis.com/mcp/v1",name:"gmail-mcp"},{type:"url",url:"https://calendarmcp.googleapis.com/mcp/v1",name:"calendar-mcp"},{type:"url",url:"https://mcp.zoominfo.com/mcp",name:"zoominfo-mcp"},{type:"url",url:"https://mcp.slack.com/mcp",name:"slack-mcp"},{type:"url",url:"https://drivemcp.googleapis.com/mcp/v1",name:"drive-mcp"},{type:"url",url:"https://api.outreach.io/mcp",name:"outreach-mcp"},{type:"url",url:"https://mcp.granola.ai/mcp",name:"granola-mcp"}];
+const BDR_SLACK_ID='U07Q1E9TAPR';
+const MGMT_CHANNEL='C0B7P2SNESZ';
+const TEAMS={outbound:{quota:'121%',s1:8,s2:'$94k',s3:11,bars:[{l:'SAOs',v:121,c:'#e91c1c'},{l:'Pipeline',v:98,c:'#4e4eda'},{l:'Meetings',v:92,c:'#21944e'}]},inbound:{quota:'114%',s1:12,s2:'$82k',s3:18,bars:[{l:'MQLs Converted',v:114,c:'#e91c1c'},{l:'SAOs',v:108,c:'#4e4eda'},{l:'Response Rate',v:95,c:'#21944e'}]},channel:{quota:'100%',s1:3,s2:'$120k',s3:7,bars:[{l:'Partner SAOs',v:100,c:'#e91c1c'},{l:'Partner Pipeline',v:110,c:'#4e4eda'},{l:'Partner Activations',v:85,c:'#f76902'}]}};
+const PLAYBOOKS={outbound:[{i:'✉️',n:'Cold Email Framework',d:'5-step formula by persona: Ops, HR, IT, Finance.',c:'6 templates'},{i:'📞',n:'Cold Call Talk Track',d:'Opening, bridge, discovery, and close.',c:'3 scripts'},{i:'🛑',n:'Objection Handling',d:'Top 12 Envoy objections with strategic responses.',c:'12 rebuttals'},{i:'🏢',n:'ICP Playbook',d:'Tier 1–3 definitions, persona maps, qualification criteria.',c:'4 segments'},{i:'🤝',n:'Handoff to AE',d:'SAO summary format, stage requirements, MEDDIC basics.',c:'2 guides'},{i:'🔁',n:'Re-engagement Sequences',d:'7-step sequences for each re-engage scenario.',c:'3 sequences'}],inbound:[{i:'⚡',n:'Inbound Response Playbook',d:'Speed-to-lead SLA, routing rules, first-touch personalization.',c:'4 flows'},{i:'🗓️',n:'Scheduling & Calendar Rules',d:'15-min buffer, 7-day rerouting, Qualified.ai coverage.',c:'2 guides'},{i:'🎯',n:'Discovery Framework',d:'Stage 1→2 qualification questions and MEDDIC mapping.',c:'1 framework'},{i:'📊',n:'MQL to SAO Conversion',d:'Tactics to move MQLs through discovery with velocity.',c:'3 tactics'}],channel:[{i:'🤝',n:'Partner Re-engagement Sequence',d:'7-step Outreach sequence for CDR co-sell motions.',c:'7 steps'},{i:'🏗️',n:'Partner Onboarding Guide',d:'Activate, enable, and track a new channel partner.',c:'1 guide'},{i:'📈',n:'Partner QBR Prep',d:'What to bring and how to drive joint pipeline.',c:'2 templates'}]};
+const RESOURCES=[{i:'📄',n:'Revenue New Hire Onboarding Templates',t:'Google Doc'},{i:'📊',n:'FY27 BDR Org Pipeline Data',t:'Google Doc'},{i:'📋',n:'Webinar SPIF Structure & Outreach Plan',t:'Google Doc'},{i:'📅',n:'Qualified.ai BDR Shift Schedule (May–Jul 2026)',t:'HTML'},{i:'🗂️',n:'AE Ready Development Program — Curriculum',t:'Word Doc'},{i:'🎨',n:'AE Ready Program — Slide Deck',t:'PowerPoint'},{i:'📝',n:'Inbound BDR Team Lead — JD & 30/60/90',t:'Google Doc'},{i:'📈',n:'EMEA Inbound BDR Q1 FY27 Analysis',t:'Word Report'},{i:'🔗',n:'Outreach Sequence Library',t:'Outreach'},{i:'🗒️',n:'March 2026 Monthly Recap (Exec)',t:'Google Doc'},{i:'📋',n:'Interview Scorecard — Outbound BDR Candidates',t:'Google Doc'},{i:'📊',n:'SPIF Reporting Template (SFDC T+7/T+30)',t:'Salesforce'}];
+let monitorActive=false,monitorInterval=null,countdownInterval=null,nextPollSecs=300,sessionScanned=0,sessionDetected=0,sessionSlacked=0,seenEmailIds=new Set(),pendingEscalations={};
+async function toggleMonitor(){if(!monitorActive){if('Notification'in window&&Notification.permission==='default')await Notification.requestPermission();startMonitor();}else stopMonitor();}
+function startMonitor(){monitorActive=true;updateMonitorUI(true);runMonitorCycle();monitorInterval=setInterval(runMonitorCycle,5*60*1000);startCountdown();}
+function stopMonitor(){monitorActive=false;clearInterval(monitorInterval);clearInterval(countdownInterval);monitorInterval=null;countdownInterval=null;nextPollSecs=300;updateMonitorUI(false);}
+function updateMonitorUI(a){const b=document.getElementById('monitor-toggle-btn'),iw=document.getElementById('monitor-icon-wrap'),t=document.getElementById('monitor-hero-title'),s=document.getElementById('monitor-hero-status'),l=document.getElementById('monitor-mode-label'),n=document.getElementById('monitor-nav'),bd=document.getElementById('monitor-badge'),tp=document.getElementById('monitor-topbar-pill'),np=document.getElementById('next-poll-label');if(a){b.className='monitor-toggle stop';b.textContent='■ Stop Monitor';iw.className='monitor-icon-wrap on';t.textContent='Monitor active — watching your inbox';s.textContent='Polling Gmail every 5 min. @here Slack alerts on every new reply.';s.className='monitor-status on';l.textContent='— Active';l.style.color='var(--cilantro-30)';n.classList.add('monitor-active');bd.style.display='flex';tp.classList.add('active');np.style.display='flex';}else{b.className='monitor-toggle start';b.textContent='▶ Start Monitor';iw.className='monitor-icon-wrap off';t.textContent='Start monitoring your inbox';s.textContent='Inactive — click Start to begin polling Gmail every 5 minutes.';s.className='monitor-status';l.textContent='— Inactive';l.style.color='var(--carbon-60)';n.classList.remove('monitor-active');bd.style.display='none';tp.classList.remove('active');np.style.display='none';}const pe=document.getElementById('notif-perm-status');if(!('Notification'in window)){pe.textContent='Not supported';pe.style.color='var(--papaya-40)';}else if(Notification.permission==='granted'){pe.textContent='Enabled ✓';pe.style.color='var(--cilantro-30)';}else if(Notification.permission==='denied'){pe.textContent='Blocked — enable in browser';pe.style.color='var(--papaya-40)';}else{pe.textContent='Not yet requested';pe.style.color='var(--carbon-50)';}}
+function startCountdown(){nextPollSecs=300;clearInterval(countdownInterval);countdownInterval=setInterval(()=>{nextPollSecs=Math.max(0,nextPollSecs-1);const m=Math.floor(nextPollSecs/60),s=nextPollSecs%60;const el=document.getElementById('next-poll-countdown');if(el)el.textContent=`${m}:${String(s).padStart(2,'0')}`;if(nextPollSecs===0)nextPollSecs=300;},1000);}
+async function runMonitorCycle(){if(!monitorActive)return;nextPollSecs=300;try{const r=await callClaude(`Use Gmail MCP to search for new emails in the last 15 minutes from external senders. Query: "is:unread newer_than:15m -from:@envoy.com -from:noreply -from:notifications@ -in:sent -in:draft". Filter out @envoy.com, noreply, notifications@, no-reply, automated, donotreply. Return ONLY valid JSON array or []. Format: [{"id":"","from_name":"","from_email":"","subject":"","snippet":""}]`,'Check Gmail.',500);const m=r.text.match(/\[[\s\S]*\]/);const emails=m?JSON.parse(m[0]):[];sessionScanned++;document.getElementById('mstat-scanned').textContent=sessionScanned;const ne=emails.filter(e=>e.id&&!seenEmailIds.has(e.id));if(ne.length>0){sessionDetected+=ne.length;document.getElementById('mstat-detected').textContent=sessionDetected;for(const em of ne){seenEmailIds.add(em.id);await handleNew(em);}}}catch(e){}}
+async function handleNew(em){if('Notification'in window&&Notification.permission==='granted'){const no=new Notification('📬 New prospect reply — respond now',{body:`${em.from_name}: ${em.snippet}`,requireInteraction:true});no.onclick=()=>{sv('agents',null,true);runAgent('reply');};}addToFeed(em);await sendDM(em);const h=setTimeout(()=>checkEsc(em),60*60*1000);pendingEscalations[em.id]=h;}
+async function sendDM(em){try{const msg=`<!here> :email: *New prospect reply — respond within 60 minutes*\n\n*From:* ${em.from_name} (${em.from_email})\n*Subject:* ${em.subject}\n*Preview:* ${em.snippet}\n\n:pencil: *Open the BDR AI Command Center → Reply Agent* to review and send your draft.\n_No reply in 60 min? Your manager will be notified in #bdr-management-notifications._`;await callClaude(`Use Slack MCP to send a DM to user ID ${BDR_SLACK_ID} with exactly:\n\n${msg}\n\nReturn {"sent":true}.`,'Send DM.',200);sessionSlacked++;document.getElementById('mstat-slacked').textContent=sessionSlacked;}catch(e){}}
+async function checkEsc(em){try{const r=await callClaude(`Use Gmail MCP. Query: "in:sent to:${em.from_email} newer_than:1h". If found return {"replied":true}. If not return {"replied":false}.`,'Check reply.',200);const m=r.text.match(/\{[\s\S]*\}/);const res=m?JSON.parse(m[0]):{replied:false};if(!res.replied)await sendEsc(em);}catch(e){await sendEsc(em);}delete pendingEscalations[em.id];}
+async function sendEsc(em){const msg=`<!here> :warning: *60-min no-reply escalation*\n\nA prospect email has gone unanswered for over 60 minutes.\n\n*BDR:* Angela Rego\n*Prospect:* ${em.from_name} (${em.from_email})\n*Subject:* ${em.subject}\n*Email received:* ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}\n\nA reply draft is waiting in their Gmail Drafts. Please follow up with the rep directly.`;try{await callClaude(`Use Slack MCP to send a message to channel ${MGMT_CHANNEL} with exactly:\n\n${msg}\n\nReturn {"sent":true}.`,'Send escalation.',200);markEsc(em.id);}catch(e){}}
+function addToFeed(em){document.getElementById('nfeed-empty').style.display='none';const f=document.getElementById('nfeed-items');const i=document.createElement('div');i.className='nitem new';i.id=`nitem-${em.id}`;const t=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});i.innerHTML=`<div class="nitem-icon" style="background:rgba(233,28,28,.12);">📧</div><div class="nitem-body"><div class="nitem-from">${escHtml(em.from_name)} <span style="color:var(--carbon-60);font-weight:400;">· ${escHtml(em.from_email)}</span></div><div class="nitem-subject">${escHtml(em.subject)}</div><div class="nitem-action" onclick="sv('agents',null,true);runAgent('reply')">Open Reply Agent →</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><div class="nitem-time">${t}</div><div id="esc-badge-${em.id}" style="font-size:9px;font-weight:700;color:var(--cilantro-30);">✓ @here DM sent</div></div>`;f.insertBefore(i,f.firstChild);}
+function markEsc(id){const b=document.getElementById(`esc-badge-${id}`);if(b){b.textContent='⚠ @here escalated';b.style.color='var(--papaya-40)';}}
+function clearFeed(){document.getElementById('nfeed-items').innerHTML='<div class="empty-feed" id="nfeed-empty">Feed cleared.</div>';}
+let replyState={threadId:null,messageId:null,toEmail:null,subject:null,draftText:''};
+async function runReplyAgent(){const le=document.getElementById('reply-loading'),ce=document.getElementById('reply-content'),se=document.getElementById('reply-status');le.style.display='flex';ce.style.display='none';se.textContent='Scanning Gmail for recent prospect replies...';const r=await callClaude(`Use Gmail MCP (query: "is:unread newer_than:5d -from:me -in:sent -in:draft -from:@envoy.com"). Pick most actionable. Use get_thread for full body. Return ONLY valid JSON: {"senderName":"","senderEmail":"","company":"","subject":"","messageId":"","threadId":"","theirMessage":"excerpt","strategicRead":["signal","trap","approach"],"draftReply":"body"}. If none, use realistic Brex example.`,'Run reply agent.');let p=null;if(r.ok){try{const m=r.text.match(/\{[\s\S]*\}/);if(m)p=JSON.parse(m[0]);}catch(e){}}if(!p)p={senderName:"Marcus Reid",senderEmail:"mreid@brex.com",company:"Brex",subject:"Re: Visitor management at Brex",messageId:null,threadId:null,theirMessage:"Appreciate the outreach. We're evaluating workplace solutions. What does Envoy cost? Can you send a one-pager?",strategicRead:["Active evaluation — high intent. They're in buy mode.","Trap: price-first = race to the bottom. Do not quote.","Redirect to fit — 20-min check, not a sales call."],draftReply:"Marcus — great timing. Pricing at Envoy is scoped to your footprint, so a one-pager won't give you an accurate picture. I'd rather spend 20 minutes understanding what you're solving for first. Does Thursday or Friday work?"};replyState={threadId:p.threadId,messageId:p.messageId,toEmail:p.senderEmail,subject:p.subject,draftText:p.draftReply};le.style.display='none';ce.style.display='block';renderReplyUI(p);}
+function renderReplyUI(d){document.getElementById('reply-content').innerHTML=`<div id="draft-success" style="display:none;" class="success-banner"><span class="success-icon">✅</span><div><div class="success-text">Draft saved to Gmail</div><div class="success-sub">Threaded to the original message. Open Gmail to review and send.</div></div><a class="gmail-link" href="https://mail.google.com/mail/u/0/#drafts" target="_blank">Open Drafts →</a></div><div class="reply-card"><div class="reply-card-header"><div><div class="reply-from">${escHtml(d.senderName)} · ${escHtml(d.company)}</div><div class="reply-subject">${escHtml(d.subject)}</div></div><div style="font-size:10px;color:var(--carbon-60);">${escHtml(d.senderEmail)}</div></div><div class="reply-body-label">Their message</div><div class="reply-body">"${escHtml(d.theirMessage)}"</div><div class="strategy-row">${d.strategicRead.map((s,i)=>`<span class="stag ${['grn','ora','blu'][i]}">${escHtml(s)}</span>`).join('')}</div><div class="draft-section"><div class="draft-label">✏️ Draft reply <span style="font-size:9px;color:var(--carbon-60);font-weight:400;margin-left:4px;">Edit before saving</span></div><textarea class="draft-editor" id="draft-editor" oninput="replyState.draftText=this.value">${escHtml(d.draftReply)}</textarea><div class="draft-actions"><button class="abtn p" id="save-draft-btn" onclick="saveDraftToGmail()">💌 Save to Gmail Drafts</button><button class="abtn s" onclick="regenDraft()">↻ Regenerate</button><button class="abtn s" style="margin-left:auto;" onclick="sv('agents',null,true)">← Back</button></div></div></div>`;}
+async function saveDraftToGmail(){const btn=document.getElementById('save-draft-btn');const dt=document.getElementById('draft-editor').value.trim();btn.disabled=true;btn.textContent='⏳ Saving...';await callClaude(`Use Gmail MCP create_draft with: to:["${replyState.toEmail||'prospect@co.com'}"], subject:"${replyState.subject||'Re: Envoy follow-up'}", body:${JSON.stringify(dt)}${replyState.messageId?`, replyToMessageId:"${replyState.messageId}"`:''}. Return {"success":true}.`,'Create Gmail draft.',300).catch(()=>{});document.getElementById('draft-success').style.display='flex';btn.textContent='✅ Saved';btn.style.background='var(--cilantro-40)';setTimeout(()=>{btn.disabled=false;btn.textContent='💌 Save to Gmail Drafts';btn.style.background='';},4000);}
+async function regenDraft(){const ed=document.getElementById('draft-editor');ed.value='Regenerating...';ed.disabled=true;const r=await callClaude('Write a new 2-4 sentence strategic reply for a BDR selling Envoy responding to a prospect who asked about pricing. Redirect to discovery, no price. Direct and human. Return only the email body.','New draft.',250);ed.value=r.ok?r.text.trim():replyState.draftText;replyState.draftText=ed.value;ed.disabled=false;}
+const AGENT_SYSTEM={inbox:`Use Gmail MCP (query:"is:unread newer_than:3d -in:sent"). Categorize: 🔴 Needs reply today, 🟡 FYI, ⚪ Auto-replies. Add strategic notes. If unavailable, produce a realistic example.`,tasks:`Use Gmail MCP (query:"is:starred OR subject:follow up newer_than:7d") and Google Calendar MCP for today's events. Output: 🔴 Overdue, 🟡 Due today, ⚪ This week.`,brief:`Use Google Calendar MCP for next meeting. ZoomInfo MCP for company intel. Granola MCP for past notes. Output: About person, Company snapshot, Previous meeting history (Granola), Discovery questions, Talk tracks.`,debrief:`Use Granola MCP for most recent meeting. Extract: 1) Summary, 2) MEDDIC signals, 3) Your action items, 4) Their commitments, 5) Salesforce notes paragraph, 6) Recommended next step.`,history:`Use Granola MCP to search all meetings for an account. Build timeline, summarize relationship health and next angle. Default to "Brex" if unspecified.`,signal:`Use ZoomInfo MCP for scoops and intent signals on Envoy ICP accounts (200-5000 employees, workplace needs). Output: top 5 accounts with signal and action.`,sequence:`Use ZoomInfo MCP to research "Robinhood". Write a 6-step sequence for Facilities Manager/VP Ops/Head of RE: Day 1 email, Day 3 LinkedIn, Day 5 call, Day 8 email 2, Day 12 follow-up, Day 17 breakup.`};
+const AGENT_META={inbox:{title:'Daily Inbox Brief',sub:'Connecting to Gmail — scanning recent prospect emails...'},tasks:{title:'Outstanding Tasks',sub:'Pulling from Gmail + Google Calendar...'},brief:{title:'Discovery Meeting Brief',sub:'Checking Calendar + ZoomInfo + Granola...'},debrief:{title:'Post-Call Debrief',sub:'Pulling your most recent Granola meeting notes...'},history:{title:'Meeting History Lookup',sub:'Searching Granola for past meetings...'},signal:{title:'Signal Agent',sub:'Scanning ZoomInfo for intent signals and scoops...'},sequence:{title:'Sequence Builder',sub:'Pulling company data from ZoomInfo...'}};
+const AGENT_ACTIONS={inbox:[{l:'Draft reply ↗',c:'p',p:'Draft a strategic reply to the most interesting prospect email from my inbox brief'},{l:'Open Gmail',c:'s',link:'https://mail.google.com'}],tasks:[{l:'Plan to clear today ↗',c:'p',p:'Help me prioritize the top overdue tasks'},{l:'Open Salesforce',c:'s',link:'https://envoy.lightning.force.com'}],brief:[{l:'Add to Salesforce notes ↗',c:'p',p:'Format the discovery brief as Salesforce call prep notes'},{l:'Open ZoomInfo',c:'s',link:'https://app.zoominfo.com'}],debrief:[{l:'Copy Salesforce notes ↗',c:'p',p:'Give me just the Salesforce notes section'},{l:'Draft follow-up email ↗',c:'s',p:'Draft a follow-up email confirming next steps from the debrief'}],history:[{l:'Write re-engagement email ↗',c:'p',p:'Write a personalized re-engagement email referencing our previous conversations'},{l:'Open Granola',c:'s',link:'https://app.granola.ai'}],signal:[{l:'Write first touch ↗',c:'p',p:'Write a personalized first-touch cold email for the highest-signal account'},{l:'Open ZoomInfo',c:'s',link:'https://app.zoominfo.com'}],sequence:[{l:'Customize for different account ↗',c:'p',p:'Rewrite the sequence for a VP of Operations at Brex — they just announced an office expansion'},{l:'Open Outreach',c:'s',link:'https://app.outreach.io'}]};
+async function callClaude(system,userMsg,maxTokens=1000){const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:maxTokens,system,messages:[{role:'user',content:userMsg}],mcp_servers:MCP_SERVERS})});const data=await resp.json();if(data.content)return{ok:true,text:data.content.filter(b=>b.type==='text').map(b=>b.text).join('\n')};return{ok:false,text:data.error?.message||'Unknown error'};}
+function renderOutput(text){return'<div class="os">'+text.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/^#{1,3} (.+)$/gm,'<div class="ost" style="margin-top:14px;">$1</div>').replace(/🔴([^\n]+)/g,'<div class="ost" style="color:var(--red-40);margin-top:12px;">🔴$1</div>').replace(/🟡([^\n]+)/g,'<div class="ost" style="color:var(--papaya-40);margin-top:12px;">🟡$1</div>').replace(/⚪([^\n]+)/g,'<div class="ost" style="color:var(--carbon-60);margin-top:12px;">⚪$1</div>').replace(/^[→•\-] (.+)$/gm,'<div class="oi"><span class="ob">→</span><span>$1</span></div>').replace(/\n\n/g,'</div><div class="os">').replace(/\n/g,'<br>')+'</div>';}
+async function runAgent(key){if(key==='reply'){document.getElementById('run-title').textContent='Reply Agent';document.getElementById('run-sub').textContent='Scanning Gmail for recent prospect replies...';document.getElementById('run-badge').innerHTML='<span style="font-size:9px;font-weight:600;color:var(--cilantro-30);background:rgba(78,193,118,.1);border-radius:4px;padding:2px 8px;">💌 Saves to Gmail Drafts</span>';document.getElementById('regular-output').style.display='none';document.getElementById('reply-output').style.display='block';showRunView();await runReplyAgent();return;}const meta=AGENT_META[key],acts=AGENT_ACTIONS[key]||[];document.getElementById('run-title').textContent=meta.title;document.getElementById('run-sub').textContent=meta.sub;document.getElementById('run-badge').innerHTML=['debrief','history','brief'].includes(key)?'<span style="font-size:9px;font-weight:600;color:var(--gem-30);background:rgba(107,94,255,.15);border-radius:4px;padding:2px 8px;">✦ Granola connected</span>':'';document.getElementById('regular-output').style.display='block';document.getElementById('reply-output').style.display='none';const outEl=document.getElementById('agent-out'),actsEl=document.getElementById('agent-acts');outEl.className='obox loading';outEl.innerHTML='<div class="spin"></div><span>Connecting...</span>';actsEl.style.display='none';showRunView();const result=await callClaude(AGENT_SYSTEM[key],'Run the agent now. Return specific formatted output a BDR would read. Use real MCP data if available; otherwise produce a high-quality realistic example.').catch(e=>({ok:false,text:e.message}));outEl.className='obox';outEl.innerHTML=`<div class="oh">${meta.title.toUpperCase()} — ${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</div>`+renderOutput(result.text);actsEl.style.display='flex';actsEl.innerHTML=acts.map(a=>a.link?`<button class="abtn ${a.c}" onclick="window.open('${a.link}','_blank')">${a.l}</button>`:`<button class="abtn ${a.c}" onclick="alert('Open this in Claude to use: ${a.p}')">${a.l}</button>`).join('');}
+function showRunView(){document.querySelectorAll('[id^="view-"]').forEach(v=>{v.className='view';v.style.display='none';});document.getElementById('view-agent-run').style.display='block';document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));document.querySelectorAll('.ni')[2].classList.add('active');}
+let chatHistory=[],msgId=0;
+async function doChat(){const input=document.getElementById('cinput');const msg=input.value.trim();if(!msg)return;input.value='';document.getElementById('chips').style.display='none';appendMsg(msg,'u');chatHistory.push({role:'user',content:msg});const tid=appendMsg('...','ai');try{const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:`You are the Envoy BDR AI Assistant inside the BDR AI Command Center. Dual-mode coach and strategist. Envoy sells to Facilities Managers, VPs of Ops, HR Directors, IT leaders at 150–5,000 employee companies. Access to Gmail, Calendar, ZoomInfo, Slack, Drive, Outreach, and Granola MCP tools. Be concise and tactical. Give a specific next action at the end.`,messages:chatHistory.slice(-10),mcp_servers:MCP_SERVERS})});const data=await resp.json();const reply=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'Something went wrong.';chatHistory.push({role:'assistant',content:reply});updateMsg(tid,reply);}catch(e){updateMsg(tid,'Connection issue — try again.');}}
+function sendChip(el){document.getElementById('cinput').value=el.textContent;doChat();}
+function appendMsg(text,role){const id='m'+(++msgId);const el=document.createElement('div');el.className=`msg ${role}`;el.id=id;el.innerHTML=`<div class="mav ${role}">${role==='ai'?'AI':'ME'}</div><div class="mbub">${text}</div>`;document.getElementById('chat-msgs').appendChild(el);el.scrollIntoView({behavior:'smooth'});return id;}
+function updateMsg(id,text){const el=document.getElementById(id);if(el)el.querySelector('.mbub').textContent=text;el?.scrollIntoView({behavior:'smooth'});}
+let team='outbound';
+function sv(id,navEl,back){document.querySelectorAll('[id^="view-"]').forEach(v=>{v.className='view';v.style.display='none';});const el=document.getElementById('view-'+id);if(!el)return;if(id==='chat'){el.style.display='flex';el.classList.add('active');}else if(id==='agent-run'){el.style.display='block';}else{el.style.display='block';el.classList.add('active');}if(!back){document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));if(navEl)navEl.classList.add('active');}if(id==='playbooks')renderPlaybooks();if(id==='resources')renderResources();if(id==='pipeline')renderPipeBars();if(id==='home')loadCalendar();if(id==='leaderboard')renderLeaderboard();if(id==='attainment')renderAttainment();if(id==='funnel')renderFunnel();if(id==='segment')renderSegment();}
+function setTeam(t,btn){team=t;document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const d=TEAMS[t];document.getElementById('qd').textContent=d.quota;document.getElementById('s1').textContent=d.s1;document.getElementById('s2').textContent=d.s2;document.getElementById('s3').textContent=d.s3;renderQBars(d.bars,'qbars');if(document.getElementById('view-playbooks').style.display!=='none')renderPlaybooks();}
+function renderQBars(bars,id){const el=document.getElementById(id);if(!el)return;el.innerHTML=bars.map(b=>`<div class="qbw"><div class="qbl"><span style="font-size:10px;color:var(--carbon-50);">${b.l}</span><span style="font-size:10px;font-weight:700;color:white;">${b.v}%</span></div><div class="qbt"><div class="qbf" style="width:${Math.min(b.v,100)}%;background:${b.c};"></div></div></div>`).join('');}
+function renderPlaybooks(){const p=PLAYBOOKS[team];document.getElementById('pgrid').innerHTML=p.map(x=>`<div class="pcard"><div class="pico">${x.i}</div><div class="pn">${x.n}</div><div class="pd">${x.d}</div><div class="pc">${x.c} →</div></div>`).join('');document.getElementById('psub').textContent=`${team.charAt(0).toUpperCase()+team.slice(1)} BDR`;}
+function renderResources(){document.getElementById('rlist').innerHTML=RESOURCES.map(r=>`<div class="rrow"><span class="rico">${r.i}</span><span class="rn">${r.n}</span><span class="rt">${r.t}</span></div>`).join('');}
+function renderPipeBars(){const bars=[{l:'Stage 1 — Prospecting',v:24,c:'var(--carbon-60)'},{l:'Stage 2 — SAO',v:8,c:'var(--brand)'},{l:'Stage 3 — Proposal',v:5,c:'var(--gem-60)'},{l:'Stage 4 — Negotiate',v:2,c:'var(--papaya-40)'},{l:'Closed Won',v:2,c:'var(--cilantro-40)'}];document.getElementById('plbars').innerHTML=bars.map(b=>`<div class="qbw"><div class="qbl"><span style="font-size:10px;color:var(--carbon-50);">${b.l}</span><span style="font-size:10px;font-weight:700;color:white;">${b.v} opps</span></div><div class="qbt"><div class="qbf" style="width:${(b.v/24)*100}%;background:${b.c};"></div></div></div>`).join('');}
+function chkTask(el){el.style.background='var(--brand)';el.style.borderColor='var(--brand)';el.innerHTML='<span style="color:white;font-size:8px;">✓</span>';setTimeout(()=>{el.parentElement.style.opacity='.4';},300);}
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+async function loadCalendar(){try{const now=new Date(),start=new Date(now.getFullYear(),now.getMonth(),now.getDate()).toISOString(),end=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59).toISOString();const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,system:`Use Google Calendar MCP to list events for today (${start} to ${end}). Return ONLY a JSON array: [{time,title,company,type}] where type: discovery,followup,demo,internal,other.`,messages:[{role:'user',content:'List my meetings today as JSON.'}],mcp_servers:MCP_SERVERS})});const data=await resp.json();const text=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('');const m=text?.match(/\[[\s\S]*\]/);if(m){renderCal(JSON.parse(m[0]));}else{renderCalFallback();}}catch(e){renderCalFallback();}}
+function renderCal(meetings){const card=document.getElementById('cal-card');const tagMap={discovery:'td',followup:'tf',demo:'tg'};const labelMap={discovery:'Discovery',followup:'Follow-up',demo:'Demo'};if(!meetings.length){card.innerHTML='<div class="hct">📅 Today\'s meetings <span class="live-badge">● Live</span></div><div style="font-size:11px;color:var(--carbon-60);">No meetings today.</div>';return;}card.innerHTML='<div class="hct">📅 Today\'s meetings <span class="live-badge">● Live</span></div>'+meetings.slice(0,5).map(m=>`<div class="mi"><div class="mtime">${m.time||''}</div><div><div class="mname">${m.title||''}</div><div class="mco">${m.company||''}</div></div>${m.type&&m.type!=='internal'?`<div class="mtag ${tagMap[m.type]||'td'}">${labelMap[m.type]||m.type}</div>`:''}</div>`).join('');}
+function renderCalFallback(){document.getElementById('cal-card').innerHTML=`<div class="hct">📅 Today's meetings</div><div class="mi"><div class="mtime">9:00am</div><div><div class="mname">Sarah Chen</div><div class="mco">Figma · VP of Ops</div></div><div class="mtag td">Discovery</div></div><div class="mi"><div class="mtime">11:30am</div><div><div class="mname">Marcus Reid</div><div class="mco">Brex · Head of Workplace</div></div><div class="mtag tf">Follow-up</div></div><div class="mi"><div class="mtime">2:00pm</div><div><div class="mname">Priya Nair</div><div class="mco">Stripe · Facilities Mgr</div></div><div class="mtag tg">Demo</div></div>`;}
+renderQBars(TEAMS.outbound.bars,'qbars');
+loadCalendar();
+updateMonitorUI(false);
+// ── SEGMENT PIPELINE ──────────────────────────────────────────────────────────
+var SG_SEGS=['smb','mm','ent'];
+var SG_LABELS={smb:'SMB',mm:'Mid Market',ent:'Enterprise'};
+var SG_CLRS={smb:'var(--gem-30)',mm:'var(--papaya-40)',ent:'var(--red-40)'};
+var SG_BG={smb:'background:rgba(78,78,218,.15);color:var(--gem-30);',mm:'background:rgba(247,105,2,.12);color:var(--papaya-40);',ent:'background:rgba(233,28,28,.12);color:var(--red-40);'};
+var SG_DATA={
+  outbound:{label:'Outbound BDR',badge:'outbound',reps:[
+    {name:'Payton Cravalho',  initials:'PC',color:'#e91c1c',segs:{
+      smb:{jun:{s1:4,s2:1,s3:0,s4:0,s5:0,won:0,lost:0,arr:8000},  q2:{s1:18,s2:5,s3:2,s4:1,s5:1,won:0,lost:1,arr:36000}, q1:{s1:28,s2:12,s3:6,s4:4,s5:3,won:1,lost:2,arr:82000}, fy27:{s1:46,s2:17,s3:8,s4:5,s5:4,won:1,lost:3,arr:118000}},
+      mm: {jun:{s1:3,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:10000}, q2:{s1:14,s2:4,s3:2,s4:1,s5:1,won:1,lost:1,arr:42000}, q1:{s1:22,s2:10,s3:6,s4:4,s5:3,won:2,lost:2,arr:96000}, fy27:{s1:36,s2:14,s3:8,s4:5,s5:4,won:3,lost:3,arr:138000}},
+      ent:{jun:{s1:2,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:6,s2:1,s3:1,s4:1,s5:0,won:0,lost:0,arr:14000}, q1:{s1:12,s2:4,s3:2,s4:1,s5:0,won:1,lost:1,arr:40000}, fy27:{s1:18,s2:5,s3:3,s4:2,s5:0,won:1,lost:1,arr:54000}}}},
+    {name:'Christian Lyles',  initials:'CL',color:'#4e4eda',segs:{
+      smb:{jun:{s1:3,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:14,s2:4,s3:2,s4:1,s5:1,won:1,lost:0,arr:34000}, q1:{s1:26,s2:12,s3:6,s4:4,s5:3,won:2,lost:2,arr:92000}, fy27:{s1:40,s2:16,s3:8,s4:5,s5:3,won:3,lost:2,arr:126000}},
+      mm: {jun:{s1:2,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:10,s2:3,s3:1,s4:1,s5:0,won:0,lost:1,arr:28000}, q1:{s1:20,s2:10,s3:5,s4:3,s5:2,won:1,lost:2,arr:76000}, fy27:{s1:30,s2:13,s3:6,s4:4,s5:2,won:1,lost:3,arr:104000}},
+      ent:{jun:{s1:1,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:5,s2:1,s3:1,s4:0,s5:0,won:0,lost:0,arr:12000}, q1:{s1:12,s2:4,s3:2,s4:1,s5:0,won:0,lost:0,arr:30000}, fy27:{s1:17,s2:5,s3:3,s4:1,s5:1,won:0,lost:0,arr:42000}}}},
+    {name:'Querren Makasi',   initials:'QM',color:'#f76902',segs:{
+      smb:{jun:{s1:2,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:10,s2:3,s3:1,s4:0,s5:0,won:0,lost:0,arr:22000}, q1:{s1:18,s2:6,s3:2,s4:1,s5:1,won:1,lost:1,arr:38000}, fy27:{s1:28,s2:9,s3:3,s4:2,s5:1,won:1,lost:1,arr:60000}},
+      mm: {jun:{s1:1,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:8,s2:2,s3:1,s4:1,s5:1,won:0,lost:1,arr:18000}, q1:{s1:14,s2:4,s3:2,s4:1,s5:1,won:0,lost:2,arr:30000}, fy27:{s1:22,s2:6,s3:3,s4:2,s5:1,won:0,lost:3,arr:48000}},
+      ent:{jun:{s1:1,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:4,s2:1,s3:0,s4:0,s5:0,won:0,lost:0,arr:8000},  q1:{s1:8,s2:2,s3:1,s4:1,s5:0,won:0,lost:0,arr:14000}, fy27:{s1:12,s2:3,s3:1,s4:0,s5:1,won:0,lost:0,arr:22000}}}},
+    {name:'Wilson Prendergast',initials:'WP',color:'#21944e',segs:{
+      smb:{jun:{s1:1,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:8,s2:2,s3:1,s4:0,s5:0,won:0,lost:0,arr:12000}, q1:{s1:16,s2:9,s3:4,s4:2,s5:2,won:1,lost:1,arr:58000}, fy27:{s1:24,s2:11,s3:5,s4:3,s5:2,won:1,lost:2,arr:70000}},
+      mm: {jun:{s1:1,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:7,s2:2,s3:1,s4:1,s5:1,won:0,lost:1,arr:14000}, q1:{s1:14,s2:7,s3:3,s4:2,s5:1,won:1,lost:2,arr:52000}, fy27:{s1:21,s2:9,s3:4,s4:2,s5:2,won:1,lost:2,arr:66000}},
+      ent:{jun:{s1:1,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:3,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:5000},  q1:{s1:6,s2:3,s3:1,s4:1,s5:1,won:0,lost:0,arr:18000}, fy27:{s1:9,s2:3,s3:1,s4:1,s5:1,won:0,lost:0,arr:23000}}}},
+  ]},
+  inbound:{label:'Inbound BDR',badge:'inbound',reps:[
+    {name:'Malaya Hood',      initials:'MH',color:'#e91c1c',segs:{
+      smb:{jun:{s1:6,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:82,s2:22,s3:12,s4:8,s5:5,won:2,lost:3,arr:186000},q1:{s1:84,s2:78,s3:44,s4:28,s5:20,won:10,lost:13,arr:740000},fy27:{s1:166,s2:100,s3:56,s4:36,s5:25,won:12,lost:16,arr:926000}},
+      mm: {jun:{s1:5,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:68,s2:20,s3:11,s4:7,s5:5,won:3,lost:4,arr:216000},q1:{s1:72,s2:64,s3:36,s4:22,s5:16,won:8,lost:10,arr:592000},fy27:{s1:140,s2:84,s3:47,s4:30,s5:21,won:11,lost:14,arr:808000}},
+      ent:{jun:{s1:3,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:32,s2:8,s3:5,s4:3,s5:3,won:1,lost:1,arr:88000}, q1:{s1:28,s2:28,s3:18,s4:12,s5:8,won:4,lost:5,arr:288000},fy27:{s1:60,s2:36,s3:23,s4:14,s5:11,won:5,lost:6,arr:376000}}}},
+    {name:'Maria Dacanay',    initials:'MD',color:'#4e4eda',segs:{
+      smb:{jun:{s1:8,s2:1,s3:0,s4:0,s5:0,won:0,lost:0,arr:18000}, q2:{s1:74,s2:17,s3:9,s4:5,s5:3,won:2,lost:3,arr:154000},q1:{s1:82,s2:64,s3:36,s4:22,s5:16,won:8,lost:11,arr:596000},fy27:{s1:156,s2:81,s3:45,s4:27,s5:19,won:10,lost:14,arr:750000}},
+      mm: {jun:{s1:6,s2:1,s3:0,s4:0,s5:0,won:0,lost:0,arr:18000}, q2:{s1:60,s2:14,s3:8,s4:5,s5:3,won:2,lost:2,arr:126000},q1:{s1:68,s2:52,s3:30,s4:18,s5:13,won:6,lost:9,arr:468000}, fy27:{s1:128,s2:66,s3:38,s4:23,s5:16,won:8,lost:11,arr:594000}},
+      ent:{jun:{s1:4,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:6000},  q2:{s1:30,s2:6,s3:3,s4:2,s5:2,won:0,lost:1,arr:60000}, q1:{s1:30,s2:24,s3:14,s4:10,s5:6,won:3,lost:4,arr:256000},fy27:{s1:60,s2:30,s3:17,s4:12,s5:8,won:3,lost:5,arr:316000}}}},
+    {name:'Wes Porter',       initials:'WP2',color:'#7083ff',segs:{
+      smb:{jun:{s1:5,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:66,s2:14,s3:7,s4:4,s5:3,won:1,lost:2,arr:128000},q1:{s1:74,s2:66,s3:36,s4:22,s5:15,won:7,lost:10,arr:558000},fy27:{s1:140,s2:80,s3:43,s4:26,s5:18,won:8,lost:12,arr:686000}},
+      mm: {jun:{s1:4,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:56,s2:13,s3:7,s4:4,s5:3,won:2,lost:2,arr:124000},q1:{s1:62,s2:56,s3:32,s4:20,s5:14,won:6,lost:8,arr:448000}, fy27:{s1:118,s2:69,s3:39,s4:24,s5:17,won:8,lost:10,arr:572000}},
+      ent:{jun:{s1:3,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:26,s2:5,s3:3,s4:2,s5:1,won:0,lost:1,arr:46000}, q1:{s1:26,s2:24,s3:14,s4:10,s5:7,won:3,lost:4,arr:234000},fy27:{s1:52,s2:29,s3:17,s4:12,s5:8,won:3,lost:5,arr:280000}}}},
+    {name:'Lydia Kipre',      initials:'LK',color:'#f76902',segs:{
+      smb:{jun:{s1:2,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:62,s2:22,s3:10,s4:6,s5:4,won:2,lost:4,arr:172000},q1:{s1:66,s2:40,s3:19,s4:12,s5:8,won:3,lost:6,arr:288000}, fy27:{s1:128,s2:62,s3:29,s4:18,s5:12,won:5,lost:10,arr:460000}},
+      mm: {jun:{s1:2,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:52,s2:20,s3:10,s4:6,s5:4,won:2,lost:4,arr:168000},q1:{s1:56,s2:34,s3:16,s4:10,s5:7,won:3,lost:6,arr:238000}, fy27:{s1:108,s2:54,s3:26,s4:16,s5:11,won:5,lost:10,arr:406000}},
+      ent:{jun:{s1:2,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:24,s2:8,s3:4,s4:2,s5:1,won:0,lost:1,arr:47000}, q1:{s1:24,s2:13,s3:7,s4:4,s5:3,won:1,lost:2,arr:112000},  fy27:{s1:48,s2:21,s3:11,s4:6,s5:4,won:1,lost:3,arr:159000}}}},
+    {name:'Grace Leung',      initials:'GL',color:'#21944e',segs:{
+      smb:{jun:{s1:4,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:46,s2:14,s3:6,s4:3,s5:2,won:1,lost:2,arr:116000},q1:{s1:11,s2:7,s3:2,s4:1,s5:1,won:0,lost:1,arr:42000},   fy27:{s1:57,s2:21,s3:8,s4:4,s5:3,won:1,lost:3,arr:158000}},
+      mm: {jun:{s1:3,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:38,s2:12,s3:6,s4:4,s5:2,won:1,lost:2,arr:108000},q1:{s1:9,s2:6,s3:3,s4:2,s5:1,won:1,lost:1,arr:42000},    fy27:{s1:47,s2:18,s3:9,s4:6,s5:3,won:2,lost:3,arr:150000}},
+      ent:{jun:{s1:2,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},     q2:{s1:20,s2:6,s3:2,s4:1,s5:1,won:0,lost:0,arr:43000}, q1:{s1:4,s2:3,s3:1,s4:0,s5:0,won:0,lost:0,arr:14000},    fy27:{s1:24,s2:9,s3:3,s4:1,s5:1,won:0,lost:0,arr:57000}}}},
+    {name:'Garrett Dinsmore', initials:'GD',color:'#6161ff',segs:{
+      smb:{jun:{s1:6,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:10000}, q2:{s1:40,s2:11,s3:5,s4:3,s5:2,won:1,lost:2,arr:86000}, q1:{s1:6,s2:2,s3:1,s4:0,s5:0,won:0,lost:0,arr:16000},   fy27:{s1:46,s2:13,s3:6,s4:3,s5:2,won:1,lost:2,arr:102000}},
+      mm: {jun:{s1:5,s2:1,s3:0,s4:0,s5:0,won:0,lost:0,arr:10000}, q2:{s1:36,s2:10,s3:5,s4:3,s5:2,won:1,lost:2,arr:88000}, q1:{s1:6,s2:2,s3:1,s4:1,s5:1,won:0,lost:1,arr:18000},   fy27:{s1:42,s2:12,s3:6,s4:4,s5:3,won:1,lost:3,arr:106000}},
+      ent:{jun:{s1:3,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:2000},  q2:{s1:16,s2:4,s3:2,s4:1,s5:0,won:0,lost:0,arr:27000}, q1:{s1:2,s2:1,s3:0,s4:0,s5:0,won:0,lost:0,arr:4000},    fy27:{s1:18,s2:5,s3:2,s4:1,s5:0,won:0,lost:0,arr:31000}}}},
+    {name:'Zairam Ramirez',   initials:'ZR',color:'#4ec176',segs:{
+      smb:{jun:{s1:5,s2:1,s3:0,s4:0,s5:0,won:0,lost:0,arr:18000}, q2:{s1:38,s2:11,s3:5,s4:3,s5:2,won:1,lost:1,arr:84000}, q1:{s1:6,s2:2,s3:1,s4:0,s5:0,won:0,lost:0,arr:18000},   fy27:{s1:44,s2:13,s3:6,s4:3,s5:2,won:1,lost:1,arr:102000}},
+      mm: {jun:{s1:4,s2:1,s3:0,s4:0,s5:0,won:0,lost:0,arr:18000}, q2:{s1:34,s2:10,s3:4,s4:2,s5:2,won:1,lost:2,arr:86000}, q1:{s1:6,s2:3,s3:1,s4:1,s5:1,won:0,lost:1,arr:20000},   fy27:{s1:40,s2:13,s3:5,s4:3,s5:3,won:1,lost:3,arr:106000}},
+      ent:{jun:{s1:2,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:2000},  q2:{s1:16,s2:4,s3:2,s4:1,s5:0,won:0,lost:0,arr:26000}, q1:{s1:2,s2:1,s3:0,s4:0,s5:0,won:0,lost:0,arr:4000},    fy27:{s1:18,s2:5,s3:2,s4:1,s5:0,won:0,lost:0,arr:30000}}}},
+  ]}
+};
+var sgCurW='q1';
+function sgFA(v){if(!v||v===0)return'\u2014';if(v>=1000000)return'$'+(v/1000000).toFixed(1)+'M';if(v>=1000)return'$'+Math.round(v/1000)+'k';return'$'+v;}
+function sgP(n,d){return d===0?null:Math.round((n/d)*100);}
+function sgCC(p,bm){if(p===null)return'background:transparent;color:var(--carbon-70);font-size:9px;';if(p>=bm)return'background:rgba(78,193,118,.15);color:var(--cilantro-30);';if(p>=bm*0.75)return'background:rgba(78,78,218,.12);color:var(--gem-30);';if(p>=bm*0.5)return'background:rgba(247,105,2,.12);color:var(--papaya-40);';return'background:rgba(233,28,28,.1);color:var(--red-40).';}
+function sgFunnelRow(d){
+  var c12=sgP(d.s2,d.s1);
+  var stages=['s1','s2','s3','s4','s5'].map(function(s,i){
+    var clrs=['var(--gem-30)','var(--red-40)','var(--papaya-40)','#8db600','var(--cilantro-30)'];
+    return'<span style="font-size:11px;font-weight:700;color:'+clrs[i]+';font-family:Syne,sans-serif;">'+d[s]+'</span>';
+  }).join('<span style="font-size:9px;color:var(--carbon-70);margin:0 2px;">\u2192</span>');
+  return stages
+    +'<span style="font-size:9px;color:var(--carbon-70);margin:0 3px;">\u2192</span>'
+    +'<span style="font-size:11px;font-weight:700;color:var(--cilantro-30);font-family:Syne,sans-serif;">'+d.won+'W</span>'
+    +' <span style="font-size:11px;font-weight:700;color:var(--carbon-50);font-family:Syne,sans-serif;">'+d.lost+'L</span>'
+    +'<span style="font-size:11px;font-weight:700;color:var(--cilantro-30);font-family:Syne,sans-serif;margin-left:6px;">'+sgFA(d.arr)+'</span>';
+}
+function sgBuildTeam(teamKey){
+  var team=SG_DATA[teamKey];
+  var teamTot={s1:0,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0};
+  var html='';
+  SG_SEGS.forEach(function(seg){
+    var segTot={s1:0,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0};
+    var repRows=team.reps.map(function(rep){
+      var d=rep.segs[seg][sgCurW];
+      Object.keys(segTot).forEach(function(k){segTot[k]+=d[k]||0;});
+      return'<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.03);">'
+        +'<div style="width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;background:'+rep.color+'1a;color:'+rep.color+';flex-shrink:0;">'+rep.initials+'</div>'
+        +'<div style="font-size:10px;font-weight:600;color:white;min-width:100px;flex-shrink:0;">'+rep.name+'</div>'
+        +'<div style="font-size:10px;display:flex;align-items:center;gap:2px;flex-wrap:nowrap;overflow:hidden;">'+sgFunnelRow(d)+'</div>'
+        +'</div>';
+    }).join('');
+    Object.keys(teamTot).forEach(function(k){teamTot[k]+=segTot[k];});
+    var c12=sgP(segTot.s2,segTot.s1);
+    var wr=sgP(segTot.won,segTot.won+segTot.lost);
+    html+='<div style="border-bottom:1px solid var(--border);">'
+      +'<div style="display:flex;align-items:center;gap:6px;padding:9px 14px 6px;">'
+        +'<div style="width:7px;height:7px;border-radius:50%;background:'+SG_CLRS[seg]+';flex-shrink:0;"></div>'
+        +'<div style="font-size:11px;font-weight:700;color:white;">'+SG_LABELS[seg]+'</div>'
+        +'<div style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:20px;margin-left:auto;'+SG_BG[seg]+'">'+segTot.s1+' SQL · '+segTot.s2+' SAO · '+segTot.won+'W / '+segTot.lost+'L · '+sgFA(segTot.arr)+'</div>'
+      +'</div>'
+      +'<div style="padding:0 14px 8px;">'
+        +repRows
+        +'<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-top:1px solid var(--border);margin-top:2px;">'
+          +'<div style="width:20px;height:20px;flex-shrink:0;"></div>'
+          +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--carbon-60);min-width:100px;flex-shrink:0;">Team total</div>'
+          +'<div style="font-size:10px;display:flex;align-items:center;gap:2px;">'+sgFunnelRow(segTot)+'</div>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  });
+  var bdgClr=teamKey==='outbound'?'background:rgba(233,28,28,.15);color:var(--red-40)':'background:rgba(78,78,218,.2);color:var(--gem-30)';
+  var el=document.getElementById('sg-'+teamKey);if(!el)return;
+  el.innerHTML='<div class="hcard" style="padding:0;overflow:hidden;">'
+    +'<div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">'
+      +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--carbon-60);">'+team.label+'</div>'
+      +'<div style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;'+bdgClr+'">'+team.reps.length+' reps</div>'
+      +'<div style="font-size:12px;font-weight:700;color:var(--cilantro-30);font-family:Syne,sans-serif;">'+sgFA(teamTot.arr)+'</div>'
+    +'</div>'
+    +html
+    +'<div style="padding:9px 14px;background:rgba(255,255,255,.02);border-top:1px solid var(--border);display:flex;gap:14px;flex-wrap:wrap;">'
+      +'<div style="font-size:10px;color:var(--carbon-60);">Total <strong style="color:var(--gem-30);">'+teamTot.s1+'</strong> SQL</div>'
+      +'<div style="font-size:10px;color:var(--carbon-60);">Total <strong style="color:var(--red-40);">'+teamTot.s2+'</strong> SAO</div>'
+      +'<div style="font-size:10px;color:var(--carbon-60);"><strong style="color:var(--cilantro-30);">'+teamTot.won+'</strong> Won / <strong>'+teamTot.lost+'</strong> Lost</div>'
+      +'<div style="font-size:10px;color:var(--carbon-60);"><strong style="color:var(--cilantro-30);">'+sgFA(teamTot.arr)+'</strong> ARR</div>'
+    +'</div>'
+    +'</div>';
+}
+function sgBuildOverview(){
+  var allReps=SG_DATA.outbound.reps.concat(SG_DATA.inbound.reps);
+  var html='';
+  SG_SEGS.forEach(function(seg){
+    var t={s1:0,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0};
+    allReps.forEach(function(r){var d=r.segs[seg][sgCurW];Object.keys(t).forEach(function(k){t[k]+=d[k]||0;});});
+    var c12=sgP(t.s2,t.s1),wr=sgP(t.won,t.won+t.lost);
+    html+='<div class="scard" style="flex:1;min-width:160px;">'
+      +'<div style="display:flex;align-items:center;gap:5px;margin-bottom:8px;">'
+        +'<div style="width:8px;height:8px;border-radius:50%;background:'+SG_CLRS[seg]+';"></div>'
+        +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:white;">'+SG_LABELS[seg]+'</div>'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px;">'
+        +'<div><div style="font-size:16px;font-weight:700;color:var(--gem-30);font-family:Syne,sans-serif;">'+t.s1+'</div><div style="font-size:9px;color:var(--carbon-60);">SQLs</div></div>'
+        +'<div><div style="font-size:16px;font-weight:700;color:var(--red-40);font-family:Syne,sans-serif;">'+t.s2+'</div><div style="font-size:9px;color:var(--carbon-60);">SAOs</div></div>'
+        +'<div><div style="font-size:16px;font-weight:700;color:var(--cilantro-30);font-family:Syne,sans-serif;">'+t.won+'</div><div style="font-size:9px;color:var(--carbon-60);">Won</div></div>'
+        +'<div><div style="font-size:14px;font-weight:700;color:var(--cilantro-30);font-family:Syne,sans-serif;">'+sgFA(t.arr)+'</div><div style="font-size:9px;color:var(--carbon-60);">ARR</div></div>'
+        +'<div><div style="font-size:14px;font-weight:700;color:var(--papaya-40);font-family:Syne,sans-serif;">'+(c12!==null?c12+'%':'\u2014')+'</div><div style="font-size:9px;color:var(--carbon-60);">SQL\u2192SAO</div></div>'
+        +'<div><div style="font-size:14px;font-weight:700;color:var(--cilantro-30);font-family:Syne,sans-serif;">'+(wr!==null?wr+'%':'\u2014')+'</div><div style="font-size:9px;color:var(--carbon-60);">Win Rate</div></div>'
+      +'</div>'
+    +'</div>';
+  });
+  var el=document.getElementById('sg-overview');if(el)el.innerHTML=html;
+}
+function renderSegment(){
+  var allReps=SG_DATA.outbound.reps.concat(SG_DATA.inbound.reps);
+  var ts1=0,ts2=0,ta=0,tw=0;
+  allReps.forEach(function(r){SG_SEGS.forEach(function(s){var d=r.segs[s][sgCurW];ts1+=d.s1;ts2+=d.s2;ta+=d.arr;tw+=d.won;});});
+  var sq=document.getElementById('sg-sqls');if(sq)sq.textContent=ts1;
+  var sa=document.getElementById('sg-saos');if(sa)sa.textContent=ts2;
+  var ar=document.getElementById('sg-arr');if(ar)ar.textContent=sgFA(ta);
+  var wo=document.getElementById('sg-won');if(wo)wo.textContent=tw;
+  sgBuildTeam('outbound');
+  sgBuildTeam('inbound');
+  sgBuildOverview();
+}
+function setSegWindow(w,btn){
+  sgCurW=w;
+  document.querySelectorAll('#view-segment .abtn').forEach(function(t){t.className='abtn s';t.style.cssText='font-size:10px;padding:4px 10px;';});
+  btn.className='abtn p';btn.style.cssText='font-size:10px;padding:4px 10px;';
+  renderSegment();
+}
+// ── FUNNEL TRACKER ────────────────────────────────────────────────────────────
+var FW_DATA={
+  outbound:{label:'Outbound BDR',badge:'outbound',reps:[
+    {name:'Payton Cravalho',  initials:'PC',color:'#e91c1c',
+      jun:{s1:9,s2:1,s3:0,s4:0,s5:0,won:0,lost:0,arr:18000},q2:{s1:38,s2:10,s3:5,s4:3,s5:2,won:1,lost:2,arr:92000},
+      q1:{s1:62,s2:26,s3:14,s4:9,s5:6,won:4,lost:5,arr:218000},fy27:{s1:100,s2:36,s3:19,s4:12,s5:8,won:5,lost:7,arr:310000},'6mo':{s1:88,s2:28,s3:15,s4:10,s5:7,won:4,lost:6,arr:264000}},
+    {name:'Christian Lyles',  initials:'CL',color:'#4e4eda',
+      jun:{s1:6,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},q2:{s1:29,s2:8,s3:4,s4:2,s5:1,won:1,lost:1,arr:74000},
+      q1:{s1:58,s2:26,s3:13,s4:8,s5:5,won:3,lost:4,arr:198000},fy27:{s1:87,s2:34,s3:17,s4:10,s5:6,won:4,lost:5,arr:272000},'6mo':{s1:74,s2:27,s3:14,s4:9,s5:5,won:3,lost:5,arr:222000}},
+    {name:'Querren Makasi',   initials:'QM',color:'#f76902',
+      jun:{s1:4,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},q2:{s1:22,s2:6,s3:2,s4:1,s5:1,won:0,lost:1,arr:48000},
+      q1:{s1:40,s2:12,s3:5,s4:3,s5:2,won:1,lost:3,arr:82000},fy27:{s1:62,s2:18,s3:7,s4:4,s5:3,won:1,lost:4,arr:130000},'6mo':{s1:52,s2:14,s3:6,s4:3,s5:2,won:1,lost:3,arr:108000}},
+    {name:'Wilson Prendergast',initials:'WP',color:'#21944e',
+      jun:{s1:3,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},q2:{s1:18,s2:4,s3:2,s4:1,s5:1,won:0,lost:1,arr:31000},
+      q1:{s1:36,s2:19,s3:8,s4:5,s5:4,won:2,lost:3,arr:128000},fy27:{s1:54,s2:23,s3:10,s4:6,s5:5,won:2,lost:4,arr:159000},'6mo':{s1:44,s2:18,s3:9,s4:6,s5:4,won:2,lost:3,arr:140000}},
+  ]},
+  inbound:{label:'Inbound BDR',badge:'inbound',reps:[
+    {name:'Malaya Hood',      initials:'MH',color:'#e91c1c',
+      jun:{s1:14,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},q2:{s1:182,s2:50,s3:28,s4:18,s5:13,won:6,lost:8,arr:490000},
+      q1:{s1:184,s2:170,s3:98,s4:62,s5:44,won:22,lost:28,arr:1620000},fy27:{s1:366,s2:220,s3:126,s4:80,s5:57,won:28,lost:36,arr:2110000},'6mo':{s1:312,s2:184,s3:106,s4:68,s5:48,won:24,lost:32,arr:1840000}},
+    {name:'Maria Dacanay',    initials:'MD',color:'#4e4eda',
+      jun:{s1:18,s2:2,s3:0,s4:0,s5:0,won:0,lost:0,arr:42000},q2:{s1:164,s2:37,s3:20,s4:12,s5:8,won:4,lost:6,arr:340000},
+      q1:{s1:180,s2:140,s3:80,s4:50,s5:35,won:17,lost:24,arr:1320000},fy27:{s1:344,s2:177,s3:100,s4:62,s5:43,won:21,lost:30,arr:1660000},'6mo':{s1:288,s2:148,s3:84,s4:52,s5:37,won:18,lost:27,arr:1390000}},
+    {name:'Wes Porter',       initials:'WP2',color:'#7083ff',
+      jun:{s1:12,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},q2:{s1:148,s2:32,s3:17,s4:10,s5:7,won:3,lost:5,arr:298000},
+      q1:{s1:162,s2:146,s3:82,s4:52,s5:36,won:16,lost:22,arr:1240000},fy27:{s1:310,s2:178,s3:99,s4:62,s5:43,won:19,lost:27,arr:1538000},'6mo':{s1:264,s2:148,s3:84,s4:52,s5:36,won:16,lost:24,arr:1286000}},
+    {name:'Lydia Kipre',      initials:'LK',color:'#f76902',
+      jun:{s1:6,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},q2:{s1:138,s2:50,s3:24,s4:14,s5:9,won:4,lost:9,arr:387000},
+      q1:{s1:146,s2:87,s3:42,s4:26,s5:18,won:7,lost:14,arr:638000},fy27:{s1:284,s2:137,s3:66,s4:40,s5:27,won:11,lost:23,arr:1025000},'6mo':{s1:236,s2:112,s3:54,s4:32,s5:22,won:9,lost:20,arr:848000}},
+    {name:'Grace Leung',      initials:'GL',color:'#21944e',
+      jun:{s1:9,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0},q2:{s1:104,s2:32,s3:14,s4:8,s5:5,won:2,lost:4,arr:267000},
+      q1:{s1:24,s2:16,s3:6,s4:3,s5:2,won:1,lost:2,arr:98000},fy27:{s1:128,s2:48,s3:20,s4:11,s5:7,won:3,lost:6,arr:365000},'6mo':{s1:116,s2:42,s3:18,s4:10,s5:7,won:2,lost:5,arr:312000}},
+    {name:'Garrett Dinsmore', initials:'GD',color:'#6161ff',
+      jun:{s1:14,s2:1,s3:0,s4:0,s5:0,won:0,lost:0,arr:22000},q2:{s1:92,s2:25,s3:12,s4:7,s5:4,won:2,lost:4,arr:201000},
+      q1:{s1:14,s2:5,s3:2,s4:1,s5:1,won:0,lost:1,arr:38000},fy27:{s1:106,s2:30,s3:14,s4:8,s5:5,won:2,lost:5,arr:239000},'6mo':{s1:98,s2:27,s3:13,s4:8,s5:5,won:2,lost:4,arr:218000}},
+    {name:'Zairam Ramirez',   initials:'ZR',color:'#4ec176',
+      jun:{s1:11,s2:2,s3:0,s4:0,s5:0,won:0,lost:0,arr:38000},q2:{s1:88,s2:25,s3:11,s4:6,s5:4,won:2,lost:3,arr:196000},
+      q1:{s1:14,s2:6,s3:2,s4:1,s5:1,won:0,lost:1,arr:42000},fy27:{s1:102,s2:31,s3:13,s4:7,s5:5,won:2,lost:4,arr:238000},'6mo':{s1:94,s2:28,s3:12,s4:7,s5:4,won:2,lost:4,arr:220000}},
+  ]}
+};
+var fwCurrent='q1';
+function fwP(n,d){return d===0?null:Math.round((n/d)*100);}
+function fwFP(v){return v===null?'\u2014':v+'%';}
+function fwFA(v){if(!v)return'\u2014';if(v>=1000000)return'$'+(v/1000000).toFixed(1)+'M';if(v>=1000)return'$'+Math.round(v/1000)+'k';return'$'+v;}
+function fwCC(p,bm){
+  if(p===null)return'background:transparent;color:var(--carbon-70);';
+  if(p>=bm)return'background:rgba(78,193,118,.15);color:var(--cilantro-30);';
+  if(p>=bm*0.75)return'background:rgba(78,78,218,.12);color:var(--gem-30);';
+  if(p>=bm*0.5)return'background:rgba(247,105,2,.12);color:var(--papaya-40);';
+  return'background:rgba(233,28,28,.1);color:var(--red-40);';
+}
+function fwRepRow(rep,d,isTot){
+  var c12=fwP(d.s2,d.s1),c23=fwP(d.s3,d.s2),c34=fwP(d.s4,d.s3),c45=fwP(d.s5,d.s4),c5w=fwP(d.won,d.s5),cwr=fwP(d.won,d.won+d.lost),ce=fwP(d.won,d.s1);
+  var fs=isTot?'13':'12';
+  function cnt(v,clr){return'<td style="text-align:center;padding:7px 4px;vertical-align:middle;"><div style="display:inline-flex;align-items:center;justify-content:center;min-width:28px;padding:3px 4px;border-radius:4px;font-size:'+fs+'px;font-weight:700;font-family:Syne,sans-serif;'+clr+'">'+v+'</div></td>';}
+  function cv(p,bm){return'<td style="text-align:center;padding:7px 3px;vertical-align:middle;"><div style="display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:2px 5px;border-radius:20px;font-size:10px;font-weight:700;font-family:monospace;'+fwCC(p,bm)+'">'+fwFP(p)+'</div></td>';}
+  function ic(bdl){return'<td style="text-align:center;padding:7px 1px;color:var(--carbon-70);font-size:9px;vertical-align:middle;'+(bdl?'border-left:1px solid rgba(255,255,255,.06);':'')+'">\u2192</td>';}
+  function bdl(inner){return inner.replace('<td','<td style="border-left:1px solid rgba(255,255,255,.06);" ');}
+  var nameHtml=isTot
+    ?'<td style="padding:8px 8px 8px 0;"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--carbon-60);padding-left:31px;">Team total</div></td>'
+    :'<td style="padding:8px 8px 8px 0;white-space:nowrap;"><div style="display:flex;align-items:center;gap:7px;"><div style="width:23px;height:23px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;background:'+rep.color+'1a;color:'+rep.color+';flex-shrink:0;">'+rep.initials+'</div><div style="font-size:11px;font-weight:600;color:white;">'+rep.name+'</div></div></td>';
+  return'<tr style="border-bottom:1px solid rgba(255,255,255,.04);'+(isTot?'background:rgba(255,255,255,.025);border-top:1px solid var(--border);':'')+'">'+nameHtml
+    +cnt(d.s1,'background:rgba(78,78,218,.12);color:var(--gem-30);')
+    +ic(false)
+    +cnt(d.s2,'background:rgba(233,28,28,.1);color:var(--red-40);')
+    +cv(c12,82)
+    +ic(true)
+    +cnt(d.s3,'background:rgba(247,105,2,.1);color:var(--papaya-40);')
+    +cv(c23,65)
+    +ic(true)
+    +cnt(d.s4,'background:rgba(141,182,0,.1);color:#8db600;')
+    +cv(c34,70)
+    +ic(true)
+    +cnt(d.s5,'background:rgba(78,193,118,.12);color:var(--cilantro-30);')
+    +cv(c45,75)
+    +ic(true)
+    +cnt(d.won,'background:rgba(78,193,118,.16);color:var(--cilantro-30);')
+    +cnt(d.lost,'background:rgba(255,255,255,.05);color:var(--carbon-50);')
+    +cv(c5w,80)
+    +'<td style="text-align:center;padding:7px 3px;border-left:1px solid rgba(255,255,255,.06);">'+('<div style="display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:2px 5px;border-radius:20px;font-size:10px;font-weight:700;font-family:monospace;'+fwCC(cwr,55)+'">'+fwFP(cwr)+'</div>')+'</td>'
+    +cv(ce,5)
+    +'<td style="text-align:right;padding:7px 0 7px 8px;border-left:1px solid rgba(255,255,255,.06);"><div style="font-size:11px;font-weight:700;color:var(--cilantro-30);">'+fwFA(d.arr)+'</div><div style="font-size:9px;color:var(--carbon-60);">'+(d.s2>0?fwFA(Math.round(d.arr/d.s2))+'/SAO':'\u2014')+'</div></td>'
+    +'</tr>';
+}
+function fwBuildTeam(teamKey){
+  var team=FW_DATA[teamKey];
+  var tot={s1:0,s2:0,s3:0,s4:0,s5:0,won:0,lost:0,arr:0};
+  var rows=team.reps.map(function(rep){
+    var d=rep[fwCurrent];
+    ['s1','s2','s3','s4','s5','won','lost'].forEach(function(k){tot[k]+=d[k]||0;});
+    tot.arr+=d.arr||0;
+    return fwRepRow(rep,d,false);
+  }).join('');
+  rows+=fwRepRow(null,tot,true);
+  var bdgClr=teamKey==='outbound'?'background:rgba(233,28,28,.15);color:var(--red-40)':'background:rgba(78,78,218,.2);color:var(--gem-30)';
+  var hdrSh=function(txt,clr){return'<div style="display:inline-block;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:2px 6px;border-radius:3px;'+clr+'">'+txt+'</div>';};
+  var thS=function(t,bdl){return'<th style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--carbon-60);padding:0 4px 7px;text-align:center;'+(bdl?'border-left:1px solid rgba(255,255,255,.06);':'')+'">'+t+'</th>';};
+  var thC=function(t,bdl){return'<th style="font-size:8px;color:var(--carbon-70);padding:0 3px 7px;text-align:center;'+(bdl?'border-left:1px solid rgba(255,255,255,.06);':'')+'">'+t+'</th>';};
+  var el=document.getElementById('funnel-'+teamKey);if(!el)return;
+  el.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid var(--border);">'
+    +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--carbon-60);">'+team.label+'</div>'
+    +'<div style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;'+bdgClr+'">'+team.reps.length+' reps</div>'
+    +'<div style="margin-left:auto;font-size:11px;color:var(--carbon-60);">'+tot.s1+' SQL \u2192 '+tot.s2+' SAO \u2192 '+tot.s3+' S3 \u2192 '+tot.s4+' S4 \u2192 '+tot.s5+' S5 \u2192 <strong style="color:var(--cilantro-30);">'+tot.won+' Won</strong> / <span style="color:var(--carbon-50);">'+tot.lost+' Lost</span></div>'
+    +'</div>'
+    +'<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;min-width:860px;">'
+    +'<thead>'
+    +'<tr>'
+      +'<th rowspan="2" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--carbon-60);padding:0 8px 7px 0;text-align:left;min-width:145px;">Rep</th>'
+      +'<th colspan="1" style="padding:3px 4px 5px;">'+hdrSh('S1 — SQL','background:rgba(78,78,218,.15);color:var(--gem-30);')+'</th>'
+      +'<th></th>'
+      +'<th colspan="2" style="padding:3px 4px 5px;">'+hdrSh('S2 — SAO','background:rgba(233,28,28,.12);color:var(--red-40);')+'</th>'
+      +'<th colspan="2" style="padding:3px 4px 5px;border-left:1px solid rgba(255,255,255,.06);">'+hdrSh('S3 — Solution Validation','background:rgba(247,105,2,.12);color:var(--papaya-40);')+'</th>'
+      +'<th colspan="2" style="padding:3px 4px 5px;border-left:1px solid rgba(255,255,255,.06);">'+hdrSh('S4 — Negotiation','background:rgba(141,182,0,.1);color:#8db600;')+'</th>'
+      +'<th colspan="2" style="padding:3px 4px 5px;border-left:1px solid rgba(255,255,255,.06);">'+hdrSh('S5 — Purchasing','background:rgba(78,193,118,.12);color:var(--cilantro-30);')+'</th>'
+      +'<th colspan="4" style="padding:3px 4px 5px;border-left:1px solid rgba(255,255,255,.06);">'+hdrSh('Closed','background:rgba(78,193,118,.18);color:var(--cilantro-30);')+'</th>'
+      +'<th colspan="1" style="padding:3px 4px 5px;border-left:1px solid rgba(255,255,255,.06);">'+hdrSh('ARR','background:rgba(78,193,118,.1);color:var(--cilantro-40);')+'</th>'
+    +'</tr>'
+    +'<tr>'
+      +thS('SQLs',false)+thS('',false)+thS('SAOs',false)+thC('S1\u2192S2',false)
+      +thS('S3',true)+thC('S2\u2192S3',false)
+      +thS('S4',true)+thC('S3\u2192S4',false)
+      +thS('S5',true)+thC('S4\u2192S5',false)
+      +thS('Won',true)+thS('Lost',false)+thC('S5\u2192Won',false)+thC('Win%',true)+thC('S1\u2192Won',false)
+      +thS('ARR Change',true)
+    +'</tr>'
+    +'</thead>'
+    +'<tbody>'+rows+'</tbody>'
+    +'</table></div>';
+}
+function renderFunnel(){
+  var all=FW_DATA.outbound.reps.concat(FW_DATA.inbound.reps);
+  var ts1=0,ts2=0,tw=0;
+  all.forEach(function(r){var d=r[fwCurrent];ts1+=d.s1;ts2+=d.s2;tw+=d.won;});
+  var sq=document.getElementById('fh-sqls');if(sq)sq.textContent=ts1;
+  var sa=document.getElementById('fh-saos');if(sa)sa.textContent=ts2;
+  var co=document.getElementById('fh-conv');if(co)co.textContent=ts1>0?Math.round((ts2/ts1)*100)+'%':'\u2014';
+  var wo=document.getElementById('fh-won');if(wo)wo.textContent=tw;
+  fwBuildTeam('outbound');
+  fwBuildTeam('inbound');
+}
+function setFunnelWindow(w,btn){
+  fwCurrent=w;
+  document.querySelectorAll('#view-funnel .abtn').forEach(function(t){t.className='abtn s';t.style.cssText='font-size:10px;padding:4px 10px;';});
+  btn.className='abtn p';btn.style.cssText='font-size:10px;padding:4px 10px;';
+  renderFunnel();
+}
+// ── ATTAINMENT TRACKER ────────────────────────────────────────────────────────
+var AT_MONTHS=['Dec 25','Jan 26','Feb 26','Mar 26','Apr 26','May 26'];
+var AT_DATA=[
+  {key:'outbound',label:'Outbound BDR',badge:'outbound',reps:[
+    {name:'Payton Cravalho',  initials:'PC', color:'#e91c1c', tenure:'7mo',  months:[250,160,100,113,113,113]},
+    {name:'Christian Lyles',  initials:'CL', color:'#4e4eda', tenure:'8mo',  months:[140,100,75,138,113,100]},
+    {name:'Wilson Prendergast',initials:'WP',color:'#21944e', tenure:'8mo',  months:[80,100,25,100,113,50]},
+    {name:'Querren Makasi',   initials:'QM', color:'#f76902', tenure:'8mo',  months:[100,86,50,88,13,75]},
+  ]},
+  {key:'inbound',label:'Inbound BDR',badge:'inbound',reps:[
+    {name:'Malaya Hood',       initials:'MH', color:'#e91c1c', tenure:'12mo', months:[60,140,106,142,106,104]},
+    {name:'Maria Dacanay',     initials:'MD', color:'#4e4eda', tenure:'21mo', months:[56,100,83,108,100,73]},
+    {name:'Wes Porter',        initials:'WP2',color:'#7083ff', tenure:'11mo', months:[75,117,100,102,102,67]},
+    {name:'Lydia Kipre',       initials:'LK', color:'#f76902', tenure:'8mo',  months:['RAMP','RAMP',68,103,48,93]},
+    {name:'Grace Leung',       initials:'GL', color:'#21944e', tenure:'3mo',  months:[null,null,null,null,67,67]},
+    {name:'Garrett Dinsmore',  initials:'GD', color:'#6161ff', tenure:'3mo',  months:[null,null,null,null,'N/A',104]},
+    {name:'Zairam Ramirez',    initials:'ZR', color:'#4ec176', tenure:'3mo',  months:[null,null,null,null,'N/A',104]},
+  ]},
+];
+function atCalcAvg(months){var v=months.filter(function(m){return typeof m==='number';});if(v.length<3)return null;return Math.round(v.reduce(function(s,x){return s+x;},0)/v.length);}
+function atStatus(avg,months){var v=months.filter(function(m){return typeof m==='number';});if(v.length<3)return'limited';if(avg>=100)return'eligible';if(avg>=90)return'close';if(avg>=70)return'building';return'behind';}
+function atPillCls(v){if(v===null)return'background:transparent;color:var(--carbon-70);';if(v==='RAMP'||v==='N/A')return'background:rgba(255,255,255,.04);color:var(--carbon-60);';if(v>=100)return'background:rgba(78,193,118,.18);color:var(--cilantro-30);';if(v>=80)return'background:rgba(78,78,218,.15);color:var(--gem-30);';if(v>=60)return'background:rgba(255,143,51,.12);color:var(--papaya-30);';return'background:rgba(233,28,28,.12);color:var(--red-40).';}
+function atPillTxt(v){if(v===null)return'—';if(v==='RAMP')return'RAMP';if(v==='N/A')return'N/A';return v+'%';}
+function atSparkH(v){if(v===null||v==='RAMP'||v==='N/A')return 3;return Math.min(Math.max(Math.round((v/160)*22),3),22);}
+function atSparkClr(v){if(v===null||v==='RAMP'||v==='N/A')return'rgba(255,255,255,.08)';if(v>=100)return'var(--cilantro-30)';if(v>=80)return'var(--gem-40)';if(v>=60)return'var(--papaya-40)';return'var(--red-40)';}
+function renderAttainment(){
+  var totalE=0,totalC=0,totalB=0;
+  AT_DATA.forEach(function(team){
+    var el=document.getElementById('at-'+team.key);if(!el)return;
+    var rows=team.reps.map(function(rep){
+      var avg=atCalcAvg(rep.months),status=atStatus(avg,rep.months);
+      if(status==='eligible')totalE++;else if(status==='close')totalC++;else if(status==='building'||status==='behind')totalB++;
+      var pills=rep.months.map(function(v,mi){
+        var sty=atPillCls(v);var txt=atPillTxt(v);
+        var fs=v===null||v==='RAMP'||v==='N/A'?'9':'11';
+        return '<td style="text-align:center;padding:8px 5px;"><div style="display:inline-flex;align-items:center;justify-content:center;width:50px;padding:3px 0;border-radius:5px;font-size:'+fs+'px;font-weight:700;font-family:monospace;'+sty+'">'+txt+'</div></td>';
+      }).join('');
+      var spark=rep.months.map(function(v){return'<div style="width:5px;height:'+atSparkH(v)+'px;background:'+atSparkClr(v)+';border-radius:2px 2px 0 0;flex-shrink:0;"></div>';}).join('');
+      var avgTxt=avg===null?'<3mo':avg+'%';
+      var avgClr=status==='eligible'?'var(--cilantro-30)':status==='close'?'var(--gem-40)':status==='building'?'var(--papaya-40)':status==='limited'?'var(--carbon-60)':'var(--red-40)';
+      var avgBg=status==='eligible'?'rgba(78,193,118,.15)':status==='close'?'rgba(78,78,218,.12)':status==='building'?'rgba(255,143,51,.1)':status==='limited'?'rgba(255,255,255,.04)':'rgba(233,28,28,.1)';
+      var promoHtml=status==='eligible'
+        ?'<div style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(78,193,118,.15);color:var(--cilantro-30);border:1px solid rgba(78,193,118,.3);">✓ Eligible</div>'
+        :status==='close'
+        ?'<div style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(78,78,218,.1);color:var(--gem-30);border:1px solid rgba(78,78,218,.2);">'+(avg?'~'+(100-avg)+'% away':'—')+'</div>'
+        :status==='limited'
+        ?'<div style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:700;background:rgba(255,255,255,.04);color:var(--carbon-60);border:1px solid rgba(255,255,255,.08);">Insufficient data</div>'
+        :'<div style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(255,255,255,.04);color:var(--carbon-60);border:1px solid rgba(255,255,255,.08);">Not yet eligible</div>';
+      return '<tr style="border-bottom:1px solid rgba(255,255,255,.04);">'
+        +'<td style="padding:9px 10px 9px 0;white-space:nowrap;">'
+          +'<div style="display:flex;align-items:center;gap:8px;">'
+            +'<div style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;background:'+rep.color+'1a;color:'+rep.color+';flex-shrink:0;">'+rep.initials+'</div>'
+            +'<div><div style="font-size:11px;font-weight:600;color:white;">'+rep.name+'</div><div style="font-size:9px;color:var(--carbon-60);">'+rep.tenure+'</div></div>'
+          +'</div>'
+        +'</td>'
+        +pills
+        +'<td style="padding:8px 8px;vertical-align:middle;"><div style="display:flex;align-items:flex-end;gap:2px;height:22px;">'+spark+'</div></td>'
+        +'<td style="text-align:center;padding:8px 6px;vertical-align:middle;"><div style="display:inline-flex;align-items:center;justify-content:center;min-width:50px;padding:4px 7px;border-radius:5px;font-size:12px;font-weight:700;background:'+avgBg+';color:'+avgClr+';">'+avgTxt+'</div></td>'
+        +'<td style="padding:8px 0 8px 6px;vertical-align:middle;white-space:nowrap;">'+promoHtml+'</td>'
+        +'</tr>';
+    }).join('');
+    var badgeClr=team.badge==='outbound'?'background:rgba(233,28,28,.15);color:var(--red-40)':'background:rgba(78,78,218,.2);color:var(--gem-30)';
+    var eligInTeam=team.reps.filter(function(r){var a=atCalcAvg(r.months);return atStatus(a,r.months)==='eligible';}).length;
+    el.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid var(--border);">'
+      +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--carbon-60);">'+team.label+'</div>'
+      +'<div style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;'+badgeClr+'">'+team.reps.length+' reps</div>'
+      +'<div style="margin-left:auto;font-size:11px;color:var(--carbon-60);"><strong style="color:var(--cilantro-30);">'+eligInTeam+'</strong> of '+team.reps.length+' eligible</div>'
+      +'</div>'
+      +'<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;">'
+      +'<thead><tr>'
+      +'<th style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--carbon-60);padding:0 10px 7px 0;text-align:left;min-width:160px;">Rep</th>'
+      +AT_MONTHS.map(function(m){return'<th style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--carbon-60);padding:0 5px 7px;text-align:center;">'+m+'</th>';}).join('')
+      +'<th style="font-size:10px;color:var(--carbon-60);padding:0 8px 7px;text-align:center;">Trend</th>'
+      +'<th style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--carbon-60);padding:0 6px 7px;text-align:center;">6mo avg</th>'
+      +'<th style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--carbon-60);padding:0 0 7px 6px;text-align:left;">Status</th>'
+      +'</tr></thead>'
+      +'<tbody>'+rows+'</tbody>'
+      +'</table></div>';
+  });
+  var ea=document.getElementById('at-eligible');if(ea)ea.textContent=totalE;
+  var ca=document.getElementById('at-close');if(ca)ca.textContent=totalC;
+  var ba=document.getElementById('at-building');if(ba)ba.textContent=totalB;
+}
+
+// ── LEADERBOARD ────────────────────────────────────────────────────────────────
+var LB_MAY={outbound:{label:'Outbound BDR',badge:'outbound',reps:[{name:'Payton Cravalho',initials:'PC',saos:9,saoQ:8,sqls:34,arr:88000,color:'#e91c1c',final:true},{name:'Christian Lyles',initials:'CL',saos:8,saoQ:8,sqls:26,arr:71000,color:'#4e4eda',final:true},{name:'Querren Makasi',initials:'QM',saos:6,saoQ:8,sqls:19,arr:44000,color:'#f76902',final:true},{name:'Wilson Prendergast',initials:'WP',saos:4,saoQ:8,sqls:14,arr:28000,color:'#21944e',final:true}]},inbound:{label:'Inbound BDR',badge:'inbound',reps:[{name:'Malaya Hood',initials:'MH',saos:50,saoQ:48,sqls:168,arr:480000,color:'#e91c1c',final:true},{name:'Garrett Dinsmore',initials:'GD',saos:25,saoQ:24,sqls:88,arr:198000,color:'#4e4eda',final:true},{name:'Zairam Ramirez',initials:'ZR',saos:25,saoQ:24,sqls:76,arr:182000,color:'#f76902',final:true},{name:'Lydia Kipre',initials:'LK',saos:37,saoQ:40,sqls:128,arr:302000,color:'#7083ff',final:true},{name:'Maria Dacanay',initials:'MD',saos:35,saoQ:48,sqls:142,arr:298000,color:'#21944e',final:true},{name:'Wes Porter',initials:'WP2',saos:32,saoQ:48,sqls:110,arr:268000,color:'#6161ff',final:true},{name:'Grace Leung',initials:'GL',saos:32,saoQ:48,sqls:96,arr:245000,color:'#4ec176',final:true}]},channel:{label:'Channel Dev',badge:'channel',reps:[{name:'Herschel Rojas',initials:'HR',saos:22,saoQ:21,sqls:18,arr:163000,color:'#4ec176',final:true}]}};
+var LB_JUNE={outbound:{label:'Outbound BDR',badge:'outbound',reps:[{name:'Payton Cravalho',initials:'PC',saos:1,saoQ:8,sqls:9,arr:18000,color:'#e91c1c'},{name:'Christian Lyles',initials:'CL',saos:0,saoQ:8,sqls:6,arr:0,color:'#4e4eda'},{name:'Querren Makasi',initials:'QM',saos:0,saoQ:8,sqls:4,arr:0,color:'#f76902'},{name:'Wilson Prendergast',initials:'WP',saos:0,saoQ:8,sqls:3,arr:0,color:'#21944e'},{name:'Wes Porter',initials:'WP2',saos:0,saoQ:0,sqls:2,arr:0,color:'#7083ff',note:'Inbound Q2'},{name:'Malaya Hood',initials:'MH',saos:0,saoQ:0,sqls:2,arr:0,color:'#4ec176',note:'Inbound Q2'}]},inbound:{label:'Inbound BDR',badge:'inbound',reps:[{name:'Maria Dacanay',initials:'MD',saos:2,saoQ:48,sqls:18,arr:42000,color:'#e91c1c'},{name:'Garrett Dinsmore',initials:'GD',saos:1,saoQ:48,sqls:14,arr:22000,color:'#4e4eda'},{name:'Zairam Ramirez',initials:'ZR',saos:2,saoQ:48,sqls:11,arr:38000,color:'#f76902'},{name:'Grace Leung',initials:'GL',saos:0,saoQ:48,sqls:9,arr:0,color:'#21944e'},{name:'Lydia Kipre',initials:'LK',saos:0,saoQ:40,sqls:6,arr:0,color:'#7083ff'}]},channel:{label:'Channel Dev',badge:'channel',reps:[{name:'Herschel Rojas',initials:'HR',saos:0,saoQ:25,sqls:3,arr:0,color:'#4ec176'}]}};
+var LB_Q2={outbound:{label:'Outbound BDR',badge:'outbound',reps:[{name:'Payton Cravalho',initials:'PC',saos:10,saoQ:24,sqls:38,arr:92000,color:'#e91c1c'},{name:'Christian Lyles',initials:'CL',saos:8,saoQ:24,sqls:29,arr:74000,color:'#4e4eda'},{name:'Querren Makasi',initials:'QM',saos:6,saoQ:24,sqls:22,arr:48000,color:'#f76902'},{name:'Wilson Prendergast',initials:'WP',saos:4,saoQ:24,sqls:18,arr:31000,color:'#21944e'}]},inbound:{label:'Inbound BDR',badge:'inbound',reps:[{name:'Malaya Hood',initials:'MH',saos:50,saoQ:144,sqls:182,arr:490000,color:'#e91c1c',moved:true},{name:'Maria Dacanay',initials:'MD',saos:37,saoQ:144,sqls:164,arr:340000,color:'#4e4eda'},{name:'Lydia Kipre',initials:'LK',saos:50,saoQ:120,sqls:138,arr:387000,color:'#f76902'},{name:'Wes Porter',initials:'WP2',saos:32,saoQ:144,sqls:148,arr:298000,color:'#7083ff',moved:true},{name:'Grace Leung',initials:'GL',saos:32,saoQ:144,sqls:104,arr:267000,color:'#6161ff'},{name:'Garrett Dinsmore',initials:'GD',saos:25,saoQ:120,sqls:92,arr:201000,color:'#21944e'},{name:'Zairam Ramirez',initials:'ZR',saos:25,saoQ:120,sqls:88,arr:196000,color:'#4ec176'}]},channel:{label:'Channel Dev',badge:'channel',reps:[{name:'Herschel Rojas',initials:'HR',saos:22,saoQ:76,sqls:28,arr:186000,color:'#4ec176'}]}};
+var LB_PERIODS={may:LB_MAY,june:LB_JUNE,q2:LB_Q2};
+var lbPeriod='june',lbMetric='sao';
+function lbFmtArr(v){if(v>=1000000)return'$'+(v/1000000).toFixed(1)+'M';if(v>=1000)return'$'+Math.round(v/1000)+'k';return'$'+v;}
+function lbPctCls(p){if(p===null)return'pct-none';if(p>=100)return'up';if(p>=70)return'neu';if(p>=40)return'';return'ov';}
+function lbBarClr(p){if(p===null)return'var(--gem-40)';if(p>=100)return'var(--cilantro-30)';if(p>=70)return'var(--gem-40)';if(p>=40)return'var(--papaya-40)';return'var(--red-40)';}
+function lbGetVal(r){return lbMetric==='sao'?r.saos:lbMetric==='sql'?r.sqls:r.arr;}
+function lbSortReps(reps){
+  var s=reps.slice();
+  if(lbMetric==='sao'){s.sort(function(a,b){var pa=a.saoQ?a.saos/a.saoQ:-1,pb=b.saoQ?b.saos/b.saoQ:-1;return pb-pa;});}
+  else if(lbMetric==='sql'){s.sort(function(a,b){return b.sqls-a.sqls;});}
+  else{s.sort(function(a,b){return b.arr-a.arr;});}
+  return s;
+}
+function lbBuildBoard(teamKey){
+  var data=LB_PERIODS[lbPeriod],team=data[teamKey],reps=lbSortReps(team.reps);
+  var maxVal=Math.max.apply(null,reps.map(function(r){return lbGetVal(r);}));if(maxVal<1)maxVal=1;
+  var tSaos=team.reps.reduce(function(s,r){return s+r.saos;},0);
+  var tQ=team.reps.reduce(function(s,r){return s+r.saoQ;},0);
+  var tSqls=team.reps.reduce(function(s,r){return s+r.sqls;},0);
+  var tArr=team.reps.reduce(function(s,r){return s+r.arr;},0);
+  var tPct=tQ?Math.round((tSaos/tQ)*100):null;
+  var bdg=lbMetric==='sao'&&tPct!==null?tPct+'% attainment':team.reps.length+' reps';
+  var rows=reps.map(function(rep,i){
+    var val=lbGetVal(rep),pct=lbMetric==='sao'?(rep.saoQ?Math.round((rep.saos/rep.saoQ)*100):null):null;
+    var barPct=Math.min((val/maxVal)*100,100),pc=lbPctCls(pct),bc=pct!==null?lbBarClr(pct):lbBarClr(null);
+    var rkCls=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+    var pctHtml=lbMetric==='sao'?(pct!==null?'<span style="font-size:13px;font-weight:700;color:'+(pct>=100?'var(--cilantro-30)':pct>=70?'white':pct>=40?'var(--papaya-40)':'var(--red-40)')+'">'+pct+'%</span>':'<span style="font-size:11px;color:var(--carbon-60);">—</span>'):lbMetric==='sql'?'<span style="font-size:13px;font-weight:700;color:white;">'+rep.sqls+'</span>':'<span style="font-size:13px;font-weight:700;color:white;">'+lbFmtArr(rep.arr)+'</span>';
+    var subHtml=lbMetric==='sao'?'<div style="font-size:9px;color:var(--carbon-70);font-family:monospace;">'+rep.saos+(rep.saoQ?' / '+rep.saoQ:'')+'</div>':lbMetric==='sql'?'<div style="font-size:9px;color:var(--carbon-70);font-family:monospace;">'+rep.saos+' SAOs</div>':'<div style="font-size:9px;color:var(--carbon-70);font-family:monospace;">'+rep.sqls+' SQLs</div>';
+    var badges='';
+    if(rep.moved)badges+='<span style="font-size:8px;font-weight:700;text-transform:uppercase;background:rgba(78,78,218,.2);color:var(--gem-30);padding:1px 4px;border-radius:2px;margin-left:3px;">Q2 IB</span>';
+    if(rep.note&&lbPeriod==='june')badges+='<span style="font-size:8px;font-weight:700;background:rgba(247,105,2,.15);color:var(--papaya-40);padding:1px 4px;border-radius:2px;margin-left:3px;">'+rep.note+'</span>';
+    if(rep.final&&lbPeriod==='may')badges+='<span style="font-size:8px;font-weight:700;background:rgba(78,193,118,.15);color:var(--cilantro-30);padding:1px 4px;border-radius:2px;margin-left:3px;">Final</span>';
+    return '<div style="display:flex;align-items:center;gap:8px;padding:8px 14px 10px;border-bottom:1px solid rgba(255,255,255,.03);position:relative;">'
+      +'<span style="font-size:10px;color:'+(i===0?'var(--red-40)':i===1?'var(--carbon-40)':i===2?'var(--papaya-40)':'var(--carbon-70)')+';font-weight:'+(i<3?700:400)+';width:14px;text-align:center;flex-shrink:0;">'+(i+1)+'</span>'
+      +'<div style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;background:'+rep.color+'1a;color:'+rep.color+';flex-shrink:0;">'+rep.initials+'</div>'
+      +'<div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:600;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+rep.name+badges+'</div>'
+      +'<div style="font-size:9px;color:var(--carbon-60);margin-top:1px;font-family:monospace;">'+(lbMetric==='sao'?(rep.saoQ?rep.saos+' / '+rep.saoQ+' quota':rep.saos+' SAOs'):lbMetric==='sql'?rep.sqls+' SQLs':lbFmtArr(rep.arr))+'</div></div>'
+      +'<div style="text-align:right;">'+pctHtml+subHtml+'</div>'
+      +'<div style="position:absolute;bottom:0;left:14px;right:14px;height:2px;background:rgba(255,255,255,.04);border-radius:1px;overflow:hidden;"><div style="height:100%;width:0%;background:'+bc+';border-radius:1px;transition:width 900ms cubic-bezier(.2,0,0,1);" data-target="'+barPct.toFixed(1)+'"></div></div>'
+      +'</div>';
+  }).join('');
+  var badgeCls=teamKey==='outbound'?'background:rgba(233,28,28,.15);color:var(--red-40)':teamKey==='inbound'?'background:rgba(78,78,218,.2);color:var(--gem-30)':'background:rgba(78,193,118,.15);color:var(--cilantro-30)';
+  var footerMain=lbMetric==='sao'?tSaos+' / '+tQ+' SAOs':lbMetric==='sql'?tSqls+' SQLs':lbFmtArr(tArr);
+  var footerSub=lbMetric==='sao'?'Team SAO attainment':lbMetric==='sql'?'Team SQLs MTD':'Team ARR MTD';
+  var footerPct=tPct!==null&&lbMetric==='sao'?'<span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;margin-left:8px;background:rgba('+(tPct>=100?'78,193,118,.15);color:var(--cilantro-30)':tPct>=70?'78,78,218,.15);color:var(--gem-30)':tPct>=40?'247,105,2,.12);color:var(--papaya-40)':'233,28,28,.1);color:var(--red-40)')+'">'+tPct+'%</span>':'';
+  return '<div class="hcard" style="padding:0;overflow:hidden;">'
+    +'<div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">'
+      +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--carbon-60);">'+team.label+'</div>'
+      +'<div style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;'+badgeCls+'">'+bdg+'</div>'
+    +'</div>'
+    +'<div>'+rows+'</div>'
+    +'<div style="padding:9px 14px;background:rgba(255,255,255,.02);border-top:1px solid var(--border);display:flex;align-items:center;">'
+      +'<div style="font-size:12px;font-weight:700;color:white;">'+footerMain+'</div>'
+      +'<div style="font-size:10px;color:var(--carbon-60);margin-left:6px;">'+footerSub+'</div>'
+      +footerPct
+    +'</div>'
+    +'</div>';
+}
+function renderLeaderboard(){
+  var el=document.getElementById('lb-boards');
+  if(!el)return;
+  el.innerHTML=lbBuildBoard('outbound')+lbBuildBoard('inbound')+lbBuildBoard('channel');
+  requestAnimationFrame(function(){setTimeout(function(){document.querySelectorAll('#lb-boards [data-target]').forEach(function(b){b.style.width=b.dataset.target+'%';});},150);});
+  var meta={may:'May 2026 · All teams · Final results',june:'June 2026 · All teams · Monthly SAO attainment',q2:'Q2 FY27 (May–Jul) · All teams · Quarterly SAO attainment'};
+  var s=document.getElementById('lb-period-sub');if(s)s.textContent=meta[lbPeriod];
+}
+function setLBPeriod(p,btn){
+  lbPeriod=p;
+  ['may','june','q2'].forEach(function(k){
+    var b=document.getElementById('lptab-'+k);if(!b)return;
+    b.className='abtn s';b.style.background='';b.style.color='';
+  });
+  btn.className='abtn p';
+  if(p==='q2'){btn.style.background='var(--gem-70)';btn.style.color='white';}
+  else if(p==='may'){btn.style.background='var(--papaya-60)';btn.style.color='white';}
+  renderLeaderboard();
+}
+function setLBMetric(m,btn){
+  lbMetric=m;
+  ['sao','sql','arr'].forEach(function(k){var b=document.getElementById('lmtab-'+k);if(b){b.className='abtn s';b.style.background='';}});
+  btn.className='abtn p';renderLeaderboard();
+}
+</script>
+</body>
+</html>
